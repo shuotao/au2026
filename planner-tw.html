@@ -122,6 +122,9 @@ main{padding:16px clamp(14px,2.2vw,26px) 60px; min-width:0}
 .en{font-size:10.5px; color:var(--muted); line-height:1.4; margin:0;
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
 .cfoot{margin-top:auto; display:flex; align-items:center; gap:5px; flex-wrap:wrap; padding-top:6px; border-top:1px solid var(--line-2)}
+.oflink{font-size:10px; font-weight:600; padding:1.5px 6px; border-radius:3px; text-decoration:none;
+  color:var(--muted); border:1px solid var(--line-2); white-space:nowrap}
+.oflink:hover{color:var(--accent-ink); border-color:var(--accent)}
 .code{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600; color:var(--muted)}
 .grade{font-size:10px; font-weight:700; padding:1.5px 6px; border-radius:3px; background:var(--live-soft); color:var(--live-ink)}
 .grade.fmt-badge{background:var(--line-2); color:var(--muted)}
@@ -425,6 +428,9 @@ const AXIS_MAX = Math.ceil(Math.max(...DATA.map(d=>pos(d.min)+d.dur))/60)*60;
 const clock = p => {const t=((p-60)%1440+1440)%1440;
   return String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0");};
 const BY={}; DATA.forEach(d=>BY[d.c]=d);
+// 官方議程目錄支援 ?search= 參數，用議程代碼即可帶到該場次（需登入 AU 帳號才看得到完整說明）
+const OFFICIAL='https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/catalog?search=';
+const officialURL=c=>OFFICIAL+encodeURIComponent(c);
 // dm: "od" 隨選／"lv" 固定時段直播／"unk" 目錄未收錄／"" 現場場次（沒有線上版本）
 const dmClass = dm => dm==="od" ? "od" : dm==="unk" ? "unk" : dm==="lv" ? "lv" : "onsite";
 const dmCardClass = dm => dm==="od" ? "is-od" : dm==="unk" ? "is-unk" : dm==="lv" ? "is-live" : "is-onsite";
@@ -550,6 +556,8 @@ function fillModal(){
     +'<dt>主題</dt><dd>'+esc(d.topic)+'</dd>'
     +'<dt>能否線上</dt><dd>'+esc(d.src)+'</dd>'
     +'<dt>🏗 實踐強度</dt><dd>'+(d.prac>0?"★".repeat(d.prac):d.prac<0?"不評分（實作／交流場次，課名關鍵字判斷不適用）":"無實踐訊號（標題未含實作關鍵字；Roadmap 與 Keynote 一律歸此類）")+'</dd>'
+    +'<dt>官方說明</dt><dd><a href="'+officialURL(d.c)+'" target="_blank" rel="noopener noreferrer">'
+    +'在 AU 官方目錄開啟 ↗</a>　<span style="color:var(--muted)">完整摘要與講者名單（需登入 AU 帳號）</span></dd>'
     +'</dl>'
     +'<div class="macts">'
     +'<button class="mact mj" data-m="main" aria-pressed="'+(m==="main")+'">'+(m==="main"?"✓ 主修":"加為主修")+'</button>'
@@ -594,6 +602,8 @@ function drawBrowse(){
      +'<div class="cfoot"><span class="code">'+esc(d.c)+'</span>'
      +(d.prac>0?'<span class="grade" title="實踐強度">🏗'+"★".repeat(d.prac)+'</span>'
        :d.prac<0?'<span class="grade fmt-badge" title="形式">'+(FMTBADGE[d.fmt]||esc(d.fmt))+'</span>':'')
+     +'<a class="oflink" href="'+officialURL(d.c)+'" target="_blank" rel="noopener noreferrer"'
+     +' title="到官方議程目錄看完整說明與講者（需登入 AU 帳號）">官方說明 ↗</a>'
      +'<span class="mk"><button class="mkb" data-m="main" aria-pressed="'+(m==="main")+'">主修</button>'
      +'<button class="mkb alt" data-m="alt" aria-pressed="'+(m==="alt")+'">輔修</button></span>'
      +'</div></article>';
@@ -603,6 +613,7 @@ function drawBrowse(){
     el.addEventListener("dragstart",ev=>{ev.dataTransfer.setData("text/plain",c); ev.dataTransfer.effectAllowed="move";});
     el.addEventListener("contextmenu",ev=>{ev.preventDefault(); openMenu(ev.clientX,ev.clientY,c);});
     el.addEventListener("click",ev=>{
+      if(ev.target.closest("a")) return;   // 點官方連結時不要同時開詳情
       const b=ev.target.closest(".mkb");
       if(b){ const m=b.dataset.m; setMark(c, marks[c]===m?null:m); return; }
       openModal(c);
