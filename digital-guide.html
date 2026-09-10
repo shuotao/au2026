@@ -174,8 +174,9 @@ main{padding:14px 16px 60px;max-width:1180px;margin:0 auto}
     <br><span class="sw" style="background:var(--live)"></span><b>紅色＝固定時段直播</b>：官方目錄歸在 Live-streamed，有指定開播時間 → 想看就要卡台北時間。
     <br><span class="sw" style="background:var(--ok)"></span><b>綠色＝隨選</b>：官方目錄歸在 On-demand，活動期間內可看 → 不必為它調鬧鐘。
     <br><b>關於重播：</b>官方目錄<b>並未載明</b>直播場次事後是否提供重播，本頁不做這個推論。
-    要確認請點卡片裡的官方議程連結。另外，97 場隨選在目錄裡共用同一個上架時間，
-    那不是約定時段，所以這些卡片只標「隨選」而不顯示時鐘。
+    要確認請點卡片裡的官方議程連結。另外，官方目錄給隨選場次列的時間是<b>上架時間</b>、不是約定時段
+    （其中 97 場甚至共用同一個時間），所以隨選卡片一律只標「隨選」而不顯示時鐘；
+    原始的目錄時間仍保留在展開的詳情裡。
     <br>直播時間一律換算成<b>台北時間</b>（拉斯維加斯 PDT ＋15 小時）。展開卡片可看講者、完整摘要與官方連結；收藏只存在你自己的瀏覽器。
   </div>
   <div id="out"></div>
@@ -302,7 +303,7 @@ function detailHTML(d){
   const row=(k,v)=>v?'<div class="row"><span class="k">'+k+'</span>'+esc(v)+'</div>':"";
   return '<div class="detail">'+
     row("講者",d.sp)+row("產品",d.pr)+row("產業",d.ind)+row("學習路徑",d.lp)+
-    row(d.bulk?"目錄上架時間（非約定時段）":"拉斯維加斯時間", d.vegas+" PDT")+
+    row(d.live?"拉斯維加斯時間":"目錄列示時間（非約定時段）", d.vegas+" PDT")+
     (d.ab?'<div class="ab">'+esc(d.ab)+'</div>':"")+
     (d.url?'<a href="'+esc(d.url)+'" target="_blank" rel="noopener">官方議程頁 ↗</a>':"")+
     '</div>';
@@ -314,7 +315,7 @@ function cardHTML(d){
     '<div class="top"><span class="code">'+esc(d.c)+'</span>'+
     (d.live
       ? '<span class="time">'+esc(d.tw)+(d.twe?"–"+esc(d.twe):"")+'<i>台北時間</i></span>'
-      : '<span class="time nofix">'+(d.bulk?"隨選":esc(d.tw))+'<i>'+(d.bulk?"無固定時段":"台北 · 目錄列示")+'</i></span>')+
+      : '<span class="time nofix">隨選<i>無固定時段</i></span>')+
     '</div>'+
     '<div class="title">'+esc(d.t)+'</div>'+
     '<div class="badges">'+badges(d)+'</div>'+
