@@ -122,6 +122,9 @@ main{padding:16px clamp(14px,2.2vw,26px) 60px; min-width:0}
 .en{font-size:10.5px; color:var(--muted); line-height:1.4; margin:0;
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
 .cfoot{margin-top:auto; display:flex; align-items:center; gap:5px; flex-wrap:wrap; padding-top:6px; border-top:1px solid var(--line-2)}
+.oflink{font-size:10px; font-weight:600; padding:1.5px 6px; border-radius:3px; text-decoration:none;
+  color:var(--muted); border:1px solid var(--line-2); white-space:nowrap}
+.oflink:hover{color:var(--accent-ink); border-color:var(--accent)}
 .code{font-family:"IBM Plex Mono",monospace; font-size:10.5px; font-weight:600; color:var(--muted)}
 .grade{font-size:10px; font-weight:700; padding:1.5px 6px; border-radius:3px; background:var(--live-soft); color:var(--live-ink)}
 .grade.fmt-badge{background:var(--line-2); color:var(--muted)}
@@ -425,6 +428,11 @@ const AXIS_MAX = Math.ceil(Math.max(...DATA.map(d=>pos(d.min)+d.dur))/60)*60;
 const clock = p => {const t=((p-60)%1440+1440)%1440;
   return String(Math.floor(t/60)).padStart(2,"0")+":"+String(t%60).padStart(2,"0");};
 const BY={}; DATA.forEach(d=>BY[d.c]=d);
+// 官方議程頁用 RainFocus 內部 sessionID，與議程代碼無推導關係，故附對照表。
+// 目前涵蓋官方數位議程目錄的 169 場；查不到的就不顯示連結。
+const SESSIONID={"MFG1914":"1783105103005001PLwX","CS3038":"1783105126336001PpfR","AS3393":"1783105132417001PTZE","BES4067":"1783105142483001PUlQ","BLD2712":"1783105120814001PDMS","BES3266":"1783105129651001P9u0","CES3138":"1783105129097001PVyz","LS2969":"1783105124646001P35H","BES1245":"1783105090003001PdBx","CS3291":"1783105130764001PobL","BES3590":"1783105135683001P6gX","TR1675":"1783105099137001PeBS","CES3922":"1783105141351001PiIJ","CP1340":"1783105091155001P4cL","AS1652":"1783105097991001PG08","CP2848":"1783105123551001PNXI","BES1631":"1783105096869001PcRP","BLD3760":"1783105138474001PbES","BES3601":"1783105136232001Pk7y","CS4180":"1783105146895001PvZR","BLD1870":"1783105102462001P3NB","BES1377":"1783105091704001P45J","AS1619":"1783105095734001PYxm","MFG1025":"1783105084110001PZCc","MFG3103":"1783105128550001P7Fi","CS3571":"1783105135135001PmBG","BLD1669":"1783105098563001Psa2","BES3063":"1783105127437001PBsZ","BES3331":"1783105131309001Pwxx","CES2118":"1783105107422001PJjY","CES1592":"1783105094617001PMyb","CS3563":"1783105134584001PuPN","FAB1996":"1783105105237001PcWl","AU4178":"1783105146340001PP0K","MFG2507":"1783105115317001PKkc","CES1635":"1783105097424001PORi","BLD2703":"1783105120275001PHMl","EDU1915":"1783105103564001PRP6","BES3454":"1783105132956001POm3","CES2572":"1783105116959001PJI2","MFG1493":"1783105092396001P6Dg","AS2841":"1783105123006001PT79","AU2467":"1783105114208001PZg7","MFG3883":"1783105140678001PKpp","CES3061":"1783105126884001Pzfq","FTV1750":"1783105099685001PTek","BLD1826":"1783105101344001PLQx","CES1044":"1783105084873001PMnL","FAB3759":"1783105137932001PMSl","BLD2772":"1783105122452001P4Ex","CES3092":"1783105127983001PeKd","MFG2259":"1783105113097001P8dj","AS1983":"1783105104668001PXiN","CES1305":"1783105090575001PhDo","CES2548":"1783105115864001PITz","IM2770":"1783105121913001PLAx","UTL3867":"1783105140137001PrlV","CP3562":"1783105134044001PaID","BLD2652":"1783105118630001PkZU","AS4166":"1783105145240001P8zi","CS3884":"1783105140804001P9Lm","CES2852":"1783105124097001PfYx","CS3468":"1783105133497001PssM","BLD3267":"1783105130201001PVs0","CES1612":"1783105095176001PAbw","AU4189":"1783105147454001Pmgq","AS2698":"1783105119743001P1b4","AU4170":"1783105145784001P3hf","AS1569":"1783105094052001PAES","BLD3677":"1783105136802001PLtx","FAB1950":"1783105104115001PVCI","BLD4086":"1783105143024001PFQO","CES1779":"1783105100793001PAPK","CS2111":"1783105106874001PiqN","BLD3379":"1783105131868001PeC1","AS3991":"1783105141934001P9vA","AS2561":"1783105117526001PDyE","BES2972":"1783105125218001PpZh","FAB2066":"1783105105788001P8Q5","PM1771":"1783105100240001P7wY","CES2741":"1783105121360001P8Ts","AS1166":"1783105088859001PK7W","CS4114":"1783105144139001Pp6v","AS2196":"1783105109670001P04Y","MFG1053":"1783105086024001PztJ","BLD1110":"1783105087750001PC1d","IM2681":"1783105119179001Pj7b","IM1125":"1783105088307001PwHM","AS2183":"1783105108546001Pspe","MFG3731":"1783105137358001PEVv","MFG2231":"1783105110837001PB55","BES2240":"1783105111949001P9BI","CP2994":"1783105125781001PZVl","WP1000":"1783466423133001tYEY","WP1003":"1783353511718001by5N","WP1004":"1783353511890001bSOe","WP1002":"1783353511561001b2Fr","KEY1001":"1783463814426001iYsV","4742":"1786064956156001EUxj","CES1217":"1773752414251001vaMm","CS1882":"1783610787819001b4nA","4521":"1783613621816001h6JX","AU1394":"1783610786206001bN9t","BES1515":"1774522344009001EyD5","AS2515":"1784146538543001uR0e","BLD3772":"1783105139035001PGwK","4534":"1783613621953001hJka","CES1558":"1783105093499001PpFQ","BLD3661":"1784235182551001o7r7","BLD2228":"1783105110259001P6AT","4490":"1783613621677001hEkd","CS3844":"1783610788695001b3EZ","AS1297":"1774013190323001sWOP","AS1552":"1774562894938001pVlC","EDU3663":"1783610788868001b9PB","AS1777":"1783610785521001bQVd","CES2338":"1775422307288001MDoP","4696":"1784035361110001hTEe","FTV2364":"1775441042194001QPps","IM1347":"1774256838562001AFUY","AU3443":"1775580654861001pa97","WP1007":"1783353512300001boxg","WP1008":"1783353512440001bgsx","WP1010":"1783353512653001bkLk","KEY1002":"1783521163092001sKDE","BES2649":"1783610786769001boCu","AU4257":"1783610786629001bl9K","CS3534":"1783610788333001b60N","AS3742":"1775595559923001sxn7","CS2138":"1783105107992001PTot","FTV2122":"1775213248407001zShd","GA2236":"1775259884550001Gi83","AU4626":"1785873429262001Iesw","FTV2029":"1775145808816001SYOn","CES2193":"1783105109119001Pdt9","FTV2609":"1775495449658001tn83","AS3057":"1783610785873001b0c0","AS3135":"1784145829330001IVK4","CS2019":"1783610787991001bOvk","CES1594":"1783610787312001bbjR","BLD1842":"1783105101897001PmOP","GA1559":"1774590021132001mYVj","AU2135":"1783610786489001beBl","CS1257":"1773883449806001l9wr","CES1467":"1783610787150001bmRQ","4728":"1785963134578001ywgK","WP1006":"1783353512175001buzr","WP1005":"1783353512028001bXbT","BES3035":"1775545956165001lDyI","BES2247":"1775305826464001ptxz","CS1579":"1774619292381001U9tm","CS4095":"1783105143586001Pvfl","TR1702":"1783610789260001bqNn","BES2632":"1783105118079001PeCB","TR3013":"1775540797125001bMJq","AS3860":"1783105139588001P3VU","TR1657":"1774815536783001LDCu","CES2161":"1783610787490001bc3e","AS2669":"1783610785737001bgWE","AS3913":"1783610786072001bigK","BLD3895":"1783610786986001bLnf","AS2233":"1783105111379001PWUu","CS2875":"1783610788163001bxfW","CES3970":"1783610787656001bjQq","CES4124":"1783105144692001PYz6","WP1009":"1783353512553001bQfc","WP1011":"1786376809781001mpc8","4687":"1785184830077001NEwy","4688":"1785185113838001SQ0g"};
+const officialURL=c=>{const id=SESSIONID[(c||'').toUpperCase().replace(/-D$/,'')];
+  return id?'https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/'+id:null;};
 // dm: "od" 隨選／"lv" 固定時段直播／"unk" 目錄未收錄／"" 現場場次（沒有線上版本）
 const dmClass = dm => dm==="od" ? "od" : dm==="unk" ? "unk" : dm==="lv" ? "lv" : "onsite";
 const dmCardClass = dm => dm==="od" ? "is-od" : dm==="unk" ? "is-unk" : dm==="lv" ? "is-live" : "is-onsite";
@@ -550,6 +558,8 @@ function fillModal(){
     +'<dt>主題</dt><dd>'+esc(d.topic)+'</dd>'
     +'<dt>能否線上</dt><dd>'+esc(d.src)+'</dd>'
     +'<dt>🏗 實踐強度</dt><dd>'+(d.prac>0?"★".repeat(d.prac):d.prac<0?"不評分（實作／交流場次，課名關鍵字判斷不適用）":"無實踐訊號（標題未含實作關鍵字；Roadmap 與 Keynote 一律歸此類）")+'</dd>'
+    +(officialURL(d.c)?'<dt>官方說明</dt><dd><a href="'+officialURL(d.c)+'" target="_blank" rel="noopener noreferrer">'
+      +'在 AU 官方議程頁開啟 ↗</a>　<span style="color:var(--muted)">完整說明、講者與講義下載（需登入 AU 帳號）</span></dd>':'')
     +'</dl>'
     +'<div class="macts">'
     +'<button class="mact mj" data-m="main" aria-pressed="'+(m==="main")+'">'+(m==="main"?"✓ 主修":"加為主修")+'</button>'
@@ -594,6 +604,8 @@ function drawBrowse(){
      +'<div class="cfoot"><span class="code">'+esc(d.c)+'</span>'
      +(d.prac>0?'<span class="grade" title="實踐強度">🏗'+"★".repeat(d.prac)+'</span>'
        :d.prac<0?'<span class="grade fmt-badge" title="形式">'+(FMTBADGE[d.fmt]||esc(d.fmt))+'</span>':'')
+     +(officialURL(d.c)?'<a class="oflink" href="'+officialURL(d.c)+'" target="_blank" rel="noopener noreferrer"'
+       +' title="到官方議程頁看完整說明、講者與講義（需登入 AU 帳號）">官方說明 ↗</a>':'')
      +'<span class="mk"><button class="mkb" data-m="main" aria-pressed="'+(m==="main")+'">主修</button>'
      +'<button class="mkb alt" data-m="alt" aria-pressed="'+(m==="alt")+'">輔修</button></span>'
      +'</div></article>';
@@ -603,6 +615,7 @@ function drawBrowse(){
     el.addEventListener("dragstart",ev=>{ev.dataTransfer.setData("text/plain",c); ev.dataTransfer.effectAllowed="move";});
     el.addEventListener("contextmenu",ev=>{ev.preventDefault(); openMenu(ev.clientX,ev.clientY,c);});
     el.addEventListener("click",ev=>{
+      if(ev.target.closest("a")) return;   // 點官方連結時不要同時開詳情
       const b=ev.target.closest(".mkb");
       if(b){ const m=b.dataset.m; setMark(c, marks[c]===m?null:m); return; }
       openModal(c);
