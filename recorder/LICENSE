@@ -1,0 +1,37 @@
+MIT License
+
+Copyright (c) 2026 hh
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Scope of this license / 授權範圍
+
+This license covers the au2026rec source code only. It does NOT grant any
+rights to content recorded with this software. Autodesk University session
+recordings, slides and handouts remain the property of Autodesk Inc. and the
+respective speakers. Users are solely responsible for complying with the
+Autodesk University terms of use, applicable copyright law and the laws of
+their jurisdiction.
+
+本授權僅涵蓋 au2026rec 的程式碼，不授予任何與「使用本工具錄下的內容」相關的
+權利。AU 課程的影音、簡報與講義著作權屬 Autodesk Inc. 及各場次講者所有。
+使用者須自行遵守 Autodesk University 使用條款、著作權法及所在地法令，
+並對自己的使用行為負全部責任。

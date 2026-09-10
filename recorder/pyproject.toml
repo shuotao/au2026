@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "au2026rec"
+version = "0.1.0"
+description = "把 AU2026 已選課 CSV 課表變成無人值守的自動開課 + OBS 錄影排程器"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = [
+    "obsws-python>=1.7",
+    "playwright>=1.47",
+    "tzdata>=2024.1; sys_platform == 'win32'",
+]
+
+[project.scripts]
+au2026rec = "au2026rec.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["au2026rec*"]
