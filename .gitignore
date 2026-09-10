@@ -1,0 +1,11 @@
+# 個人／機敏文件 — 本 repo 是 public + GitHub Pages，切勿提交
+*.pdf
+*.msg
+ESTA-Status-Summary.html
+出差申請單*
+刷卡授權結果*
+江碩濤*
+ChenKuan*
+
+# 工作暫存
+src/
