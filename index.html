@@ -1,357 +1,1223 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AU 2026 選課工具總覽</title>
-<style>
-:root{
-  --bg:#f6f7f9; --panel:#fff; --ink:#1a1d22; --sub:#5b6470; --line:#e3e6ea;
-  --dig:#1f6feb; --dig-bg:#e7f0ff; --ip:#d97706; --ip-bg:#fdf1df;
-  --ai:#7c3aed; --ai-bg:#f0e9ff; --chip:#eef1f5; --chip-on:#1a1d22; --chip-on-ink:#fff;
-  --star:#b8860b; --star-bg:#fdf6e3; --live:#c0392b; --live-bg:#fdecea;
-  --ok:#15803d; --ok-bg:#e7f6ec; --navbg:#10233b; --navink:#dbe6f2;
-  --shadow:0 1px 3px rgba(0,0,0,.06);
-  /* 選取狀態專用色，刻意不與任何語意色（現場／線上／直播／精選）重複 */
-  --sel:#0f766e; --sel-ink:#fff;
-  /* 目錄未收錄／資訊不足 */
-  --warnline:#9a6b00;
-}
-@media (prefers-color-scheme:dark){:root{
-  --bg:#0f1115;--panel:#161a20;--ink:#e7ebf0;--sub:#9aa4b2;--line:#262c35;
-  --dig:#5b9bff;--dig-bg:#12233f;--ip:#f0a53a;--ip-bg:#3a2c12;--ai:#b18bff;--ai-bg:#251a3d;
-  --chip:#222833;--chip-on:#e7ebf0;--chip-on-ink:#0f1115;
-  --star:#e0b84a;--star-bg:#3a2f12;--live:#ef6b5e;--live-bg:#3a1c19;
-  --ok:#4ade80;--ok-bg:#12301d;--sel:#5eead4;--sel-ink:#0f1115;--warnline:#e0b84a;--shadow:0 1px 3px rgba(0,0,0,.4);}}
-:root[data-theme="dark"]{
-  --bg:#0f1115;--panel:#161a20;--ink:#e7ebf0;--sub:#9aa4b2;--line:#262c35;
-  --dig:#5b9bff;--dig-bg:#12233f;--ip:#f0a53a;--ip-bg:#3a2c12;--ai:#b18bff;--ai-bg:#251a3d;
-  --chip:#222833;--chip-on:#e7ebf0;--chip-on-ink:#0f1115;
-  --star:#e0b84a;--star-bg:#3a2f12;--live:#ef6b5e;--live-bg:#3a1c19;
-  --ok:#4ade80;--ok-bg:#12301d;--sel:#5eead4;--sel-ink:#0f1115;--warnline:#e0b84a;--shadow:0 1px 3px rgba(0,0,0,.4);}
-:root[data-theme="light"]{
-  --bg:#f6f7f9;--panel:#fff;--ink:#1a1d22;--sub:#5b6470;--line:#e3e6ea;
-  --dig:#1f6feb;--dig-bg:#e7f0ff;--ip:#d97706;--ip-bg:#fdf1df;--ai:#7c3aed;--ai-bg:#f0e9ff;
-  --chip:#eef1f5;--chip-on:#1a1d22;--chip-on-ink:#fff;
-  --star:#b8860b;--star-bg:#fdf6e3;--live:#c0392b;--live-bg:#fdecea;
-  --ok:#15803d;--ok-bg:#e7f6ec;--sel:#0f766e;--sel-ink:#fff;--warnline:#9a6b00;--shadow:0 1px 3px rgba(0,0,0,.06);}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC","Microsoft JhengHei",sans-serif;
-  -webkit-text-size-adjust:100%}
-.aunav{background:var(--navbg);color:var(--navink);font-size:12.5px;padding:7px 16px;
-  display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center}
-.aunav .brand{font-weight:700;color:#fff;margin-right:6px;letter-spacing:.02em}
-.aunav a{color:var(--navink);text-decoration:none;padding:3px 10px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.22);white-space:nowrap}
-.aunav a:hover{background:rgba(255,255,255,.12);color:#fff}
-.aunav a[aria-current="page"]{background:#fff;color:#10233b;border-color:#fff;font-weight:700}
-.themebtn{position:absolute;right:14px;top:44px;z-index:30}
-.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;
-  padding:6px 11px;cursor:pointer;font-size:12.5px;font-family:inherit}
-.btn:hover{border-color:var(--sub)}
-.btn.primary{background:var(--dig);border-color:var(--dig);color:#fff}
-.chip{border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:3px 10px;
-  border-radius:999px;cursor:pointer;font-size:12px;user-select:none;white-space:nowrap;font-family:inherit}
-.chip.on{background:var(--chip-on);color:var(--chip-on-ink);border-color:var(--chip-on)}
-.chips{display:flex;flex-wrap:wrap;gap:5px}
-.b{font-size:10.5px;padding:1.5px 7px;border-radius:999px;border:1px solid transparent;white-space:nowrap;display:inline-block}
-.b.dig{background:var(--dig-bg);color:var(--dig)}
-.b.ip{background:var(--ip-bg);color:var(--ip)}
-.b.ai{background:var(--ai-bg);color:var(--ai)}
-.b.star{background:var(--star-bg);color:var(--star);border-color:var(--star)}
-.b.live{background:var(--live-bg);color:var(--live);border-color:var(--live)}
-.b.od{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)}
-.b.mut{background:var(--chip);color:var(--sub)}
-.b.out{background:transparent;color:var(--sub);border-color:var(--line)}
-footer{border-top:1px solid var(--line);margin-top:40px;padding:18px 16px 50px;
-  color:var(--sub);font-size:12px;max-width:1180px;margin-left:auto;margin-right:auto}
-footer a{color:var(--dig)}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AU 2026 選課工具總覽</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --panel: #fff;
+      --ink: #1a1d22;
+      --sub: #5b6470;
+      --line: #e3e6ea;
+      --dig: #1f6feb;
+      --dig-bg: #e7f0ff;
+      --ip: #d97706;
+      --ip-bg: #fdf1df;
+      --ai: #7c3aed;
+      --ai-bg: #f0e9ff;
+      --chip: #eef1f5;
+      --chip-on: #1a1d22;
+      --chip-on-ink: #fff;
+      --star: #b8860b;
+      --star-bg: #fdf6e3;
+      --live: #c0392b;
+      --live-bg: #fdecea;
+      --ok: #15803d;
+      --ok-bg: #e7f6ec;
+      --navbg: #10233b;
+      --navink: #dbe6f2;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .06);
+      /* 選取狀態專用色，刻意不與任何語意色（現場／線上／直播／精選）重複 */
+      --sel: #0f766e;
+      --sel-ink: #fff;
+      /* 目錄未收錄／資訊不足 */
+      --warnline: #9a6b00;
+    }
 
-main{max-width:1080px;margin:0 auto;padding:26px 18px 40px}
-.hero{margin-bottom:26px}
-.hero .kicker{font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--sub);font-weight:700}
-.hero h1{margin:6px 0 8px;font-size:clamp(24px,4.2vw,34px);line-height:1.2;letter-spacing:-.01em}
-.hero p{margin:0;color:var(--sub);font-size:14.5px;max-width:660px;line-height:1.65}
-.hero p b{color:var(--ink)}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:22px 0 30px}
-.fact{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:12px 14px;box-shadow:var(--shadow)}
-.fact .n{font-size:23px;font-weight:800;line-height:1.15;letter-spacing:-.02em}
-.fact .l{font-size:11.5px;color:var(--sub);margin-top:3px;line-height:1.4}
-.fact.ip .n{color:var(--ip)} .fact.dg .n{color:var(--dig)}
-.fact.lv .n{color:var(--live)} .fact.od .n{color:var(--ok)}
-h2{font-size:13px;text-transform:uppercase;letter-spacing:.09em;color:var(--sub);
-  margin:34px 0 12px;font-weight:700;border-top:1px solid var(--line);padding-top:16px}
-h2:first-of-type{border-top:none;padding-top:0;margin-top:0}
-.pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;margin-bottom:8px}
-.lane{border:1px solid var(--line);border-left-width:4px;border-radius:12px;background:var(--panel);
-  padding:15px 17px;box-shadow:var(--shadow)}
-.lane.lane--onsite{border-left-color:var(--ip)} .lane.lane--remote{border-left-color:var(--dig)}
-.lane h3{margin:0 0 4px;font-size:15.5px}
-.lane .who{color:var(--sub);font-size:12.5px;margin-bottom:11px}
-.lane ol{margin:0;padding-left:19px;font-size:13px;line-height:1.75;color:var(--ink)}
-.lane ol a{color:var(--dig);font-weight:600;text-decoration:none}
-.lane ol a:hover{text-decoration:underline}
-.lane ol .why{color:var(--sub)}
-.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
-.tool{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:15px 17px;
-  box-shadow:var(--shadow);display:flex;flex-direction:column;text-decoration:none;color:inherit;
-  transition:border-color .12s,transform .12s}
-.tool:hover{border-color:var(--dig);transform:translateY(-1px)}
-.tool .tag{font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:7px}
-.tool.t-en .tag{color:var(--dig)} .tool.t-ip .tag{color:var(--ip)}
-.tool.t-dg .tag{color:var(--ok)} .tool.t-tw .tag{color:var(--ai)} .tool.t-hh .tag{color:var(--star)}
-.tool h3{margin:0 0 6px;font-size:16px;letter-spacing:-.01em}
-.tool p{margin:0 0 11px;color:var(--sub);font-size:13px;line-height:1.6;flex:1}
-.tool ul{margin:0 0 12px;padding-left:17px;color:var(--sub);font-size:12.5px;line-height:1.65}
-.tool .go{font-size:12.5px;font-weight:700;color:var(--dig)}
-.by{font-size:11.5px;color:var(--sub);margin-top:9px;padding-top:9px;border-top:1px dashed var(--line)}
-.note{border:1px dashed var(--line);border-radius:11px;background:var(--panel);padding:13px 15px;
-  color:var(--sub);font-size:12.5px;line-height:1.7}
-.note b{color:var(--ink)}
-.note code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;
-  background:var(--chip);padding:1px 5px;border-radius:4px;color:var(--ink)}
-/* ---- 右上角：簽到／共筆入口 ---- */
-.topright{position:absolute;right:14px;top:44px;z-index:40;display:flex;gap:8px;align-items:flex-start}
-.topright .themebtn{position:static;right:auto;top:auto;min-height:36px}
-.signin{position:relative}
-.signin-btn{display:inline-flex;align-items:center;gap:7px;font-weight:700;
-  background:var(--navbg);border-color:var(--navbg);color:#fff;padding:7px 13px;min-height:36px}
-.signin-btn:hover{background:#1b3a5f;border-color:#1b3a5f}
-.signin-btn .g{font-size:14px;line-height:1}
-.signin-btn[aria-expanded="true"]{background:var(--sel);border-color:var(--sel)}
-.signin-panel{position:absolute;right:0;top:calc(100% + 8px);width:min(310px,calc(100vw - 28px));
-  background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:0 8px 28px rgba(0,0,0,.22);
-  padding:15px 16px 16px;text-align:left}
-.signin-panel h2{margin:0 0 5px;font-size:15px;letter-spacing:-.01em}
-.signin-panel p{margin:0 0 11px;font-size:12.5px;color:var(--sub);line-height:1.6}
-.signin-panel p b{color:var(--ink)}
-.qrbox{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;
-  display:flex;justify-content:center;margin-bottom:11px}
-.qrbox svg{width:100%;max-width:196px;height:auto;display:block}
-.signin-link{display:block;text-align:center;background:var(--dig);color:#fff;text-decoration:none;
-  font-weight:700;font-size:13px;padding:9px 12px;border-radius:9px;min-height:38px}
-.signin-link:hover{filter:brightness(1.08)}
-.signin-url{margin:9px 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:11px;color:var(--sub);text-align:center;word-break:break-all}
-.signin-close{position:absolute;right:7px;top:7px;border:none;background:transparent;color:var(--sub);
-  font-size:17px;line-height:1;cursor:pointer;border-radius:8px;font-family:inherit;
-  width:38px;height:38px;display:flex;align-items:center;justify-content:center}
-.signin-close:hover{background:var(--chip);color:var(--ink)}
-:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
-@media(max-width:720px){
-  .themebtn{top:auto;bottom:14px;right:14px;position:fixed;box-shadow:var(--shadow)}
-  .topright{position:static;padding:12px 18px 0;display:block}
-  .signin-btn{width:100%;justify-content:center}
-  /* relative, not static: the close button is absolutely positioned and must
+    @media (prefers-color-scheme:dark) {
+      :root {
+        --bg: #0f1115;
+        --panel: #161a20;
+        --ink: #e7ebf0;
+        --sub: #9aa4b2;
+        --line: #262c35;
+        --dig: #5b9bff;
+        --dig-bg: #12233f;
+        --ip: #f0a53a;
+        --ip-bg: #3a2c12;
+        --ai: #b18bff;
+        --ai-bg: #251a3d;
+        --chip: #222833;
+        --chip-on: #e7ebf0;
+        --chip-on-ink: #0f1115;
+        --star: #e0b84a;
+        --star-bg: #3a2f12;
+        --live: #ef6b5e;
+        --live-bg: #3a1c19;
+        --ok: #4ade80;
+        --ok-bg: #12301d;
+        --sel: #5eead4;
+        --sel-ink: #0f1115;
+        --warnline: #e0b84a;
+        --shadow: 0 1px 3px rgba(0, 0, 0, .4);
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0f1115;
+      --panel: #161a20;
+      --ink: #e7ebf0;
+      --sub: #9aa4b2;
+      --line: #262c35;
+      --dig: #5b9bff;
+      --dig-bg: #12233f;
+      --ip: #f0a53a;
+      --ip-bg: #3a2c12;
+      --ai: #b18bff;
+      --ai-bg: #251a3d;
+      --chip: #222833;
+      --chip-on: #e7ebf0;
+      --chip-on-ink: #0f1115;
+      --star: #e0b84a;
+      --star-bg: #3a2f12;
+      --live: #ef6b5e;
+      --live-bg: #3a1c19;
+      --ok: #4ade80;
+      --ok-bg: #12301d;
+      --sel: #5eead4;
+      --sel-ink: #0f1115;
+      --warnline: #e0b84a;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .4);
+    }
+
+    :root[data-theme="light"] {
+      --bg: #f6f7f9;
+      --panel: #fff;
+      --ink: #1a1d22;
+      --sub: #5b6470;
+      --line: #e3e6ea;
+      --dig: #1f6feb;
+      --dig-bg: #e7f0ff;
+      --ip: #d97706;
+      --ip-bg: #fdf1df;
+      --ai: #7c3aed;
+      --ai-bg: #f0e9ff;
+      --chip: #eef1f5;
+      --chip-on: #1a1d22;
+      --chip-on-ink: #fff;
+      --star: #b8860b;
+      --star-bg: #fdf6e3;
+      --live: #c0392b;
+      --live-bg: #fdecea;
+      --ok: #15803d;
+      --ok-bg: #e7f6ec;
+      --sel: #0f766e;
+      --sel-ink: #fff;
+      --warnline: #9a6b00;
+      --shadow: 0 1px 3px rgba(0, 0, 0, .06);
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 14px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+      -webkit-text-size-adjust: 100%
+    }
+
+    .aunav {
+      background: var(--navbg);
+      color: var(--navink);
+      font-size: 12.5px;
+      padding: 7px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 8px;
+      align-items: center
+    }
+
+    .aunav .brand {
+      font-weight: 700;
+      color: #fff;
+      margin-right: 6px;
+      letter-spacing: .02em
+    }
+
+    .aunav a {
+      color: var(--navink);
+      text-decoration: none;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, .22);
+      white-space: nowrap
+    }
+
+    .aunav a:hover {
+      background: rgba(255, 255, 255, .12);
+      color: #fff
+    }
+
+    .aunav a[aria-current="page"] {
+      background: #fff;
+      color: #10233b;
+      border-color: #fff;
+      font-weight: 700
+    }
+
+    .themebtn {
+      position: absolute;
+      right: 14px;
+      top: 44px;
+      z-index: 30
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 6px 11px;
+      cursor: pointer;
+      font-size: 12.5px;
+      font-family: inherit
+    }
+
+    .btn:hover {
+      border-color: var(--sub)
+    }
+
+    .btn.primary {
+      background: var(--dig);
+      border-color: var(--dig);
+      color: #fff
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--chip);
+      color: var(--ink);
+      padding: 3px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 12px;
+      user-select: none;
+      white-space: nowrap;
+      font-family: inherit
+    }
+
+    .chip.on {
+      background: var(--chip-on);
+      color: var(--chip-on-ink);
+      border-color: var(--chip-on)
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px
+    }
+
+    .b {
+      font-size: 10.5px;
+      padding: 1.5px 7px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      display: inline-block
+    }
+
+    .b.dig {
+      background: var(--dig-bg);
+      color: var(--dig)
+    }
+
+    .b.ip {
+      background: var(--ip-bg);
+      color: var(--ip)
+    }
+
+    .b.ai {
+      background: var(--ai-bg);
+      color: var(--ai)
+    }
+
+    .b.star {
+      background: var(--star-bg);
+      color: var(--star);
+      border-color: var(--star)
+    }
+
+    .b.live {
+      background: var(--live-bg);
+      color: var(--live);
+      border-color: var(--live)
+    }
+
+    .b.od {
+      background: var(--ok-bg);
+      color: var(--ok);
+      border-color: var(--ok)
+    }
+
+    .b.mut {
+      background: var(--chip);
+      color: var(--sub)
+    }
+
+    .b.out {
+      background: transparent;
+      color: var(--sub);
+      border-color: var(--line)
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      margin-top: 40px;
+      padding: 18px 16px 50px;
+      color: var(--sub);
+      font-size: 12px;
+      max-width: 1180px;
+      margin-left: auto;
+      margin-right: auto
+    }
+
+    footer a {
+      color: var(--dig)
+    }
+
+    main {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 26px 18px 40px
+    }
+
+    .hero {
+      margin-bottom: 26px
+    }
+
+    .hero .kicker {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--sub);
+      font-weight: 700
+    }
+
+    .hero h1 {
+      margin: 6px 0 8px;
+      font-size: clamp(24px, 4.2vw, 34px);
+      line-height: 1.2;
+      letter-spacing: -.01em
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--sub);
+      font-size: 14.5px;
+      max-width: 660px;
+      line-height: 1.65
+    }
+
+    .hero p b {
+      color: var(--ink)
+    }
+
+    .facts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin: 22px 0 30px
+    }
+
+    .fact {
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      padding: 12px 14px;
+      box-shadow: var(--shadow)
+    }
+
+    .fact .n {
+      font-size: 23px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em
+    }
+
+    .fact .l {
+      font-size: 11.5px;
+      color: var(--sub);
+      margin-top: 3px;
+      line-height: 1.4
+    }
+
+    .fact.ip .n {
+      color: var(--ip)
+    }
+
+    .fact.dg .n {
+      color: var(--dig)
+    }
+
+    .fact.lv .n {
+      color: var(--live)
+    }
+
+    .fact.od .n {
+      color: var(--ok)
+    }
+
+    h2 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--sub);
+      margin: 34px 0 12px;
+      font-weight: 700;
+      border-top: 1px solid var(--line);
+      padding-top: 16px
+    }
+
+    h2:first-of-type {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0
+    }
+
+    .pick {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 12px;
+      margin-bottom: 8px
+    }
+
+    .lane {
+      border: 1px solid var(--line);
+      border-left-width: 4px;
+      border-radius: 12px;
+      background: var(--panel);
+      padding: 15px 17px;
+      box-shadow: var(--shadow)
+    }
+
+    .lane.lane--onsite {
+      border-left-color: var(--ip)
+    }
+
+    .lane.lane--remote {
+      border-left-color: var(--dig)
+    }
+
+    .lane h3 {
+      margin: 0 0 4px;
+      font-size: 15.5px
+    }
+
+    .lane .who {
+      color: var(--sub);
+      font-size: 12.5px;
+      margin-bottom: 11px
+    }
+
+    .lane ol {
+      margin: 0;
+      padding-left: 19px;
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--ink)
+    }
+
+    .lane ol a {
+      color: var(--dig);
+      font-weight: 600;
+      text-decoration: none
+    }
+
+    .lane ol a:hover {
+      text-decoration: underline
+    }
+
+    .lane ol .why {
+      color: var(--sub)
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 12px
+    }
+
+    .tool {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+      padding: 15px 17px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color .12s, transform .12s
+    }
+
+    .tool:hover {
+      border-color: var(--dig);
+      transform: translateY(-1px)
+    }
+
+    .tool .tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      margin-bottom: 7px
+    }
+
+    .tool.t-en .tag {
+      color: var(--dig)
+    }
+
+    .tool.t-ip .tag {
+      color: var(--ip)
+    }
+
+    .tool.t-dg .tag {
+      color: var(--ok)
+    }
+
+    .tool.t-tw .tag {
+      color: var(--ai)
+    }
+
+    .tool.t-hh .tag {
+      color: var(--star)
+    }
+
+    .tool.t-ai .tag {
+      color: var(--ai)
+    }
+
+    .tool h3 {
+      margin: 0 0 6px;
+      font-size: 16px;
+      letter-spacing: -.01em
+    }
+
+    .tool p {
+      margin: 0 0 11px;
+      color: var(--sub);
+      font-size: 13px;
+      line-height: 1.6;
+      flex: 1
+    }
+
+    .tool ul {
+      margin: 0 0 12px;
+      padding-left: 17px;
+      color: var(--sub);
+      font-size: 12.5px;
+      line-height: 1.65
+    }
+
+    .tool .go {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--dig)
+    }
+
+    .by {
+      font-size: 11.5px;
+      color: var(--sub);
+      margin-top: 9px;
+      padding-top: 9px;
+      border-top: 1px dashed var(--line)
+    }
+
+    .note {
+      border: 1px dashed var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      padding: 13px 15px;
+      color: var(--sub);
+      font-size: 12.5px;
+      line-height: 1.7
+    }
+
+    .note b {
+      color: var(--ink)
+    }
+
+    .note code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11.5px;
+      background: var(--chip);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--ink)
+    }
+
+    /* ---- 右上角：簽到／共筆入口 ---- */
+    .topright {
+      position: absolute;
+      right: 14px;
+      top: 44px;
+      z-index: 40;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start
+    }
+
+    .topright .themebtn {
+      position: static;
+      right: auto;
+      top: auto;
+      min-height: 36px
+    }
+
+    .signin {
+      position: relative
+    }
+
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 700;
+      background: var(--navbg);
+      border-color: var(--navbg);
+      color: #fff;
+      padding: 7px 13px;
+      min-height: 36px
+    }
+
+    .signin-btn:hover {
+      background: #1b3a5f;
+      border-color: #1b3a5f
+    }
+
+    .signin-btn .g {
+      font-size: 14px;
+      line-height: 1
+    }
+
+    .signin-btn[aria-expanded="true"] {
+      background: var(--sel);
+      border-color: var(--sel)
+    }
+
+    .signin-panel {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      width: min(310px, calc(100vw - 28px));
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .22);
+      padding: 15px 16px 16px;
+      text-align: left
+    }
+
+    .signin-panel h2 {
+      margin: 0 0 5px;
+      font-size: 15px;
+      letter-spacing: -.01em
+    }
+
+    .signin-panel p {
+      margin: 0 0 11px;
+      font-size: 12.5px;
+      color: var(--sub);
+      line-height: 1.6
+    }
+
+    .signin-panel p b {
+      color: var(--ink)
+    }
+
+    .qrbox {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 11px
+    }
+
+    .qrbox svg {
+      width: 100%;
+      max-width: 196px;
+      height: auto;
+      display: block
+    }
+
+    .signin-link {
+      display: block;
+      text-align: center;
+      background: var(--dig);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      min-height: 38px
+    }
+
+    .signin-link:hover {
+      filter: brightness(1.08)
+    }
+
+    .signin-url {
+      margin: 9px 0 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11px;
+      color: var(--sub);
+      text-align: center;
+      word-break: break-all
+    }
+
+    .signin-close {
+      position: absolute;
+      right: 7px;
+      top: 7px;
+      border: none;
+      background: transparent;
+      color: var(--sub);
+      font-size: 17px;
+      line-height: 1;
+      cursor: pointer;
+      border-radius: 8px;
+      font-family: inherit;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .signin-close:hover {
+      background: var(--chip);
+      color: var(--ink)
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--sel);
+      outline-offset: 2px
+    }
+
+    @media(max-width:720px) {
+      .themebtn {
+        top: auto;
+        bottom: 14px;
+        right: 14px;
+        position: fixed;
+        box-shadow: var(--shadow)
+      }
+
+      .topright {
+        position: static;
+        padding: 12px 18px 0;
+        display: block
+      }
+
+      .signin-btn {
+        width: 100%;
+        justify-content: center
+      }
+
+      /* relative, not static: the close button is absolutely positioned and must
      anchor to the panel itself, otherwise it lands on top of the trigger button */
-  .signin-panel{position:relative;right:auto;top:auto;width:auto;margin-top:10px;box-shadow:none}
-}
-</style>
+      .signin-panel {
+        position: relative;
+        right: auto;
+        top: auto;
+        width: auto;
+        margin-top: 10px;
+        box-shadow: none
+      }
+    }
+  </style>
 </head>
+
 <body>
-<nav class="aunav">
-  <span class="brand">AU 2026</span>
-  <a href="./index.html" aria-current="page">總覽入口</a>
-  <a href="./planner.html">全議程 Planner (EN)</a>
-  <a href="./planner.html#picks99">選課 99</a>
-  <a href="./onsite.html">現場參加者</a>
-  <a href="./digital-guide.html">數位 Pass 指南</a>
-  <a href="./planner-tw.html">台北時間選課台</a>
-  <a href="./AU2026_%E6%8C%91%E8%AA%B2%E5%B7%A5%E5%85%B7.html">數位 Pass 挑課工具</a>
-</nav>
+  <nav class="aunav">
+    <span class="brand">AU 2026</span>
+    <a href="./index.html" aria-current="page">總覽入口</a>
+    <a href="./planner.html">全議程 Planner (EN)</a>
+    <a href="./planner.html#picks99">選課 99</a>
+    <a href="./onsite.html">現場參加者</a>
+    <a href="./digital-guide.html">數位 Pass 指南</a>
+    <a href="./planner-tw.html">台北時間選課台</a>
+    <a href="./AU2026_%E6%8C%91%E8%AA%B2%E5%B7%A5%E5%85%B7.html">數位 Pass 挑課工具</a>
+    <a href="https://au2026.vercel.app/" target="_blank" rel="noopener">AI 選課顧問 ↗</a>
+  </nav>
 
-<div class="topright">
-  <button class="btn themebtn" id="theme">◐ 深／淺色</button>
-  <div class="signin">
-    <button class="btn signin-btn" id="signinBtn" aria-expanded="false" aria-controls="signinPanel">
-      <span class="g" aria-hidden="true">▣</span> 簽到 · 共筆
-    </button>
-    <div class="signin-panel" id="signinPanel" hidden>
-      <button class="signin-close" id="signinClose" aria-label="關閉簽到面板">✕</button>
-      <h2>簽到 · 拿共筆</h2>
-      <p>用手機掃這個 QR 完成簽到。<b>送出後的完成訊息裡，就是 Notion 共筆的連結。</b></p>
-      <div class="qrbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" width="35" height="35" shape-rendering="crispEdges" role="img" aria-label="簽到表單 QR code：https://forms.gle/57y7YUWXMCqghhDZA"><rect width="35" height="35" fill="#fff"/><g fill="#000"><rect x="3" y="3" width="7" height="1"/><rect x="11" y="3" width="2" height="1"/><rect x="18" y="3" width="3" height="1"/><rect x="23" y="3" width="1" height="1"/><rect x="25" y="3" width="7" height="1"/><rect x="3" y="4" width="1" height="1"/><rect x="9" y="4" width="1" height="1"/><rect x="12" y="4" width="4" height="1"/><rect x="17" y="4" width="2" height="1"/><rect x="20" y="4" width="1" height="1"/><rect x="25" y="4" width="1" height="1"/><rect x="31" y="4" width="1" height="1"/><rect x="3" y="5" width="1" height="1"/><rect x="5" y="5" width="3" height="1"/><rect x="9" y="5" width="1" height="1"/><rect x="11" y="5" width="2" height="1"/><rect x="14" y="5" width="1" height="1"/><rect x="16" y="5" width="3" height="1"/><rect x="21" y="5" width="1" height="1"/><rect x="23" y="5" width="1" height="1"/><rect x="25" y="5" width="1" height="1"/><rect x="27" y="5" width="3" height="1"/><rect x="31" y="5" width="1" height="1"/><rect x="3" y="6" width="1" height="1"/><rect x="5" y="6" width="3" height="1"/><rect x="9" y="6" width="1" height="1"/><rect x="11" y="6" width="2" height="1"/><rect x="15" y="6" width="1" height="1"/><rect x="23" y="6" width="1" height="1"/><rect x="25" y="6" width="1" height="1"/><rect x="27" y="6" width="3" height="1"/><rect x="31" y="6" width="1" height="1"/><rect x="3" y="7" width="1" height="1"/><rect x="5" y="7" width="3" height="1"/><rect x="9" y="7" width="1" height="1"/><rect x="12" y="7" width="2" height="1"/><rect x="15" y="7" width="2" height="1"/><rect x="20" y="7" width="4" height="1"/><rect x="25" y="7" width="1" height="1"/><rect x="27" y="7" width="3" height="1"/><rect x="31" y="7" width="1" height="1"/><rect x="3" y="8" width="1" height="1"/><rect x="9" y="8" width="1" height="1"/><rect x="11" y="8" width="5" height="1"/><rect x="17" y="8" width="1" height="1"/><rect x="21" y="8" width="3" height="1"/><rect x="25" y="8" width="1" height="1"/><rect x="31" y="8" width="1" height="1"/><rect x="3" y="9" width="7" height="1"/><rect x="11" y="9" width="1" height="1"/><rect x="13" y="9" width="1" height="1"/><rect x="15" y="9" width="1" height="1"/><rect x="17" y="9" width="1" height="1"/><rect x="19" y="9" width="1" height="1"/><rect x="21" y="9" width="1" height="1"/><rect x="23" y="9" width="1" height="1"/><rect x="25" y="9" width="7" height="1"/><rect x="11" y="10" width="1" height="1"/><rect x="16" y="10" width="2" height="1"/><rect x="20" y="10" width="2" height="1"/><rect x="23" y="10" width="1" height="1"/><rect x="3" y="11" width="2" height="1"/><rect x="6" y="11" width="1" height="1"/><rect x="9" y="11" width="2" height="1"/><rect x="12" y="11" width="1" height="1"/><rect x="16" y="11" width="2" height="1"/><rect x="19" y="11" width="1" height="1"/><rect x="21" y="11" width="1" height="1"/><rect x="23" y="11" width="1" height="1"/><rect x="25" y="11" width="2" height="1"/><rect x="28" y="11" width="2" height="1"/><rect x="31" y="11" width="1" height="1"/><rect x="3" y="12" width="1" height="1"/><rect x="5" y="12" width="1" height="1"/><rect x="7" y="12" width="1" height="1"/><rect x="15" y="12" width="1" height="1"/><rect x="18" y="12" width="2" height="1"/><rect x="22" y="12" width="2" height="1"/><rect x="25" y="12" width="3" height="1"/><rect x="31" y="12" width="1" height="1"/><rect x="3" y="13" width="3" height="1"/><rect x="7" y="13" width="1" height="1"/><rect x="9" y="13" width="1" height="1"/><rect x="15" y="13" width="1" height="1"/><rect x="17" y="13" width="1" height="1"/><rect x="21" y="13" width="1" height="1"/><rect x="29" y="13" width="2" height="1"/><rect x="4" y="14" width="2" height="1"/><rect x="10" y="14" width="1" height="1"/><rect x="16" y="14" width="4" height="1"/><rect x="21" y="14" width="1" height="1"/><rect x="23" y="14" width="2" height="1"/><rect x="26" y="14" width="2" height="1"/><rect x="31" y="14" width="1" height="1"/><rect x="3" y="15" width="2" height="1"/><rect x="6" y="15" width="1" height="1"/><rect x="9" y="15" width="2" height="1"/><rect x="13" y="15" width="3" height="1"/><rect x="19" y="15" width="1" height="1"/><rect x="23" y="15" width="2" height="1"/><rect x="28" y="15" width="2" height="1"/><rect x="3" y="16" width="4" height="1"/><rect x="8" y="16" width="1" height="1"/><rect x="10" y="16" width="2" height="1"/><rect x="13" y="16" width="4" height="1"/><rect x="19" y="16" width="1" height="1"/><rect x="21" y="16" width="3" height="1"/><rect x="25" y="16" width="1" height="1"/><rect x="29" y="16" width="3" height="1"/><rect x="4" y="17" width="1" height="1"/><rect x="7" y="17" width="7" height="1"/><rect x="17" y="17" width="1" height="1"/><rect x="19" y="17" width="1" height="1"/><rect x="22" y="17" width="3" height="1"/><rect x="27" y="17" width="1" height="1"/><rect x="29" y="17" width="3" height="1"/><rect x="6" y="18" width="3" height="1"/><rect x="10" y="18" width="1" height="1"/><rect x="13" y="18" width="1" height="1"/><rect x="16" y="18" width="1" height="1"/><rect x="18" y="18" width="2" height="1"/><rect x="21" y="18" width="1" height="1"/><rect x="23" y="18" width="3" height="1"/><rect x="27" y="18" width="1" height="1"/><rect x="30" y="18" width="1" height="1"/><rect x="4" y="19" width="1" height="1"/><rect x="7" y="19" width="1" height="1"/><rect x="9" y="19" width="1" height="1"/><rect x="11" y="19" width="2" height="1"/><rect x="14" y="19" width="1" height="1"/><rect x="20" y="19" width="2" height="1"/><rect x="24" y="19" width="1" height="1"/><rect x="27" y="19" width="2" height="1"/><rect x="30" y="19" width="1" height="1"/><rect x="4" y="20" width="1" height="1"/><rect x="6" y="20" width="3" height="1"/><rect x="10" y="20" width="1" height="1"/><rect x="12" y="20" width="3" height="1"/><rect x="16" y="20" width="1" height="1"/><rect x="20" y="20" width="1" height="1"/><rect x="26" y="20" width="1" height="1"/><rect x="28" y="20" width="3" height="1"/><rect x="3" y="21" width="1" height="1"/><rect x="5" y="21" width="1" height="1"/><rect x="9" y="21" width="3" height="1"/><rect x="13" y="21" width="3" height="1"/><rect x="18" y="21" width="1" height="1"/><rect x="23" y="21" width="1" height="1"/><rect x="26" y="21" width="1" height="1"/><rect x="29" y="21" width="1" height="1"/><rect x="5" y="22" width="1" height="1"/><rect x="12" y="22" width="4" height="1"/><rect x="20" y="22" width="3" height="1"/><rect x="24" y="22" width="2" height="1"/><rect x="27" y="22" width="1" height="1"/><rect x="29" y="22" width="1" height="1"/><rect x="4" y="23" width="1" height="1"/><rect x="6" y="23" width="4" height="1"/><rect x="11" y="23" width="1" height="1"/><rect x="13" y="23" width="4" height="1"/><rect x="18" y="23" width="2" height="1"/><rect x="21" y="23" width="1" height="1"/><rect x="23" y="23" width="7" height="1"/><rect x="11" y="24" width="3" height="1"/><rect x="16" y="24" width="2" height="1"/><rect x="19" y="24" width="1" height="1"/><rect x="21" y="24" width="1" height="1"/><rect x="23" y="24" width="1" height="1"/><rect x="27" y="24" width="5" height="1"/><rect x="3" y="25" width="7" height="1"/><rect x="11" y="25" width="3" height="1"/><rect x="15" y="25" width="2" height="1"/><rect x="22" y="25" width="2" height="1"/><rect x="25" y="25" width="1" height="1"/><rect x="27" y="25" width="2" height="1"/><rect x="30" y="25" width="1" height="1"/><rect x="3" y="26" width="1" height="1"/><rect x="9" y="26" width="1" height="1"/><rect x="12" y="26" width="3" height="1"/><rect x="19" y="26" width="1" height="1"/><rect x="21" y="26" width="3" height="1"/><rect x="27" y="26" width="2" height="1"/><rect x="30" y="26" width="1" height="1"/><rect x="3" y="27" width="1" height="1"/><rect x="5" y="27" width="3" height="1"/><rect x="9" y="27" width="1" height="1"/><rect x="17" y="27" width="1" height="1"/><rect x="20" y="27" width="1" height="1"/><rect x="23" y="27" width="5" height="1"/><rect x="29" y="27" width="2" height="1"/><rect x="3" y="28" width="1" height="1"/><rect x="5" y="28" width="3" height="1"/><rect x="9" y="28" width="1" height="1"/><rect x="11" y="28" width="1" height="1"/><rect x="13" y="28" width="1" height="1"/><rect x="16" y="28" width="9" height="1"/><rect x="26" y="28" width="3" height="1"/><rect x="31" y="28" width="1" height="1"/><rect x="3" y="29" width="1" height="1"/><rect x="5" y="29" width="3" height="1"/><rect x="9" y="29" width="1" height="1"/><rect x="13" y="29" width="5" height="1"/><rect x="26" y="29" width="1" height="1"/><rect x="29" y="29" width="1" height="1"/><rect x="31" y="29" width="1" height="1"/><rect x="3" y="30" width="1" height="1"/><rect x="9" y="30" width="1" height="1"/><rect x="11" y="30" width="3" height="1"/><rect x="17" y="30" width="1" height="1"/><rect x="19" y="30" width="1" height="1"/><rect x="23" y="30" width="1" height="1"/><rect x="25" y="30" width="1" height="1"/><rect x="28" y="30" width="1" height="1"/><rect x="30" y="30" width="1" height="1"/><rect x="3" y="31" width="7" height="1"/><rect x="11" y="31" width="1" height="1"/><rect x="16" y="31" width="2" height="1"/><rect x="21" y="31" width="3" height="1"/><rect x="30" y="31" width="1" height="1"/></g></svg></div>
-      <a class="signin-link" href="https://forms.gle/57y7YUWXMCqghhDZA" target="_blank" rel="noopener">
-        就用這台裝置開表單 ↗
+  <div class="topright">
+    <button class="btn themebtn" id="theme">◐ 深／淺色</button>
+    <div class="signin">
+      <button class="btn signin-btn" id="signinBtn" aria-expanded="false" aria-controls="signinPanel">
+        <span class="g" aria-hidden="true">▣</span> 簽到 · 共筆
+      </button>
+      <div class="signin-panel" id="signinPanel" hidden>
+        <button class="signin-close" id="signinClose" aria-label="關閉簽到面板">✕</button>
+        <h2>簽到 · 拿共筆</h2>
+        <p>用手機掃這個 QR 完成簽到。<b>送出後的完成訊息裡，就是 Notion 共筆的連結。</b></p>
+        <div class="qrbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" width="35" height="35"
+            shape-rendering="crispEdges" role="img" aria-label="簽到表單 QR code：https://forms.gle/57y7YUWXMCqghhDZA">
+            <rect width="35" height="35" fill="#fff" />
+            <g fill="#000">
+              <rect x="3" y="3" width="7" height="1" />
+              <rect x="11" y="3" width="2" height="1" />
+              <rect x="18" y="3" width="3" height="1" />
+              <rect x="23" y="3" width="1" height="1" />
+              <rect x="25" y="3" width="7" height="1" />
+              <rect x="3" y="4" width="1" height="1" />
+              <rect x="9" y="4" width="1" height="1" />
+              <rect x="12" y="4" width="4" height="1" />
+              <rect x="17" y="4" width="2" height="1" />
+              <rect x="20" y="4" width="1" height="1" />
+              <rect x="25" y="4" width="1" height="1" />
+              <rect x="31" y="4" width="1" height="1" />
+              <rect x="3" y="5" width="1" height="1" />
+              <rect x="5" y="5" width="3" height="1" />
+              <rect x="9" y="5" width="1" height="1" />
+              <rect x="11" y="5" width="2" height="1" />
+              <rect x="14" y="5" width="1" height="1" />
+              <rect x="16" y="5" width="3" height="1" />
+              <rect x="21" y="5" width="1" height="1" />
+              <rect x="23" y="5" width="1" height="1" />
+              <rect x="25" y="5" width="1" height="1" />
+              <rect x="27" y="5" width="3" height="1" />
+              <rect x="31" y="5" width="1" height="1" />
+              <rect x="3" y="6" width="1" height="1" />
+              <rect x="5" y="6" width="3" height="1" />
+              <rect x="9" y="6" width="1" height="1" />
+              <rect x="11" y="6" width="2" height="1" />
+              <rect x="15" y="6" width="1" height="1" />
+              <rect x="23" y="6" width="1" height="1" />
+              <rect x="25" y="6" width="1" height="1" />
+              <rect x="27" y="6" width="3" height="1" />
+              <rect x="31" y="6" width="1" height="1" />
+              <rect x="3" y="7" width="1" height="1" />
+              <rect x="5" y="7" width="3" height="1" />
+              <rect x="9" y="7" width="1" height="1" />
+              <rect x="12" y="7" width="2" height="1" />
+              <rect x="15" y="7" width="2" height="1" />
+              <rect x="20" y="7" width="4" height="1" />
+              <rect x="25" y="7" width="1" height="1" />
+              <rect x="27" y="7" width="3" height="1" />
+              <rect x="31" y="7" width="1" height="1" />
+              <rect x="3" y="8" width="1" height="1" />
+              <rect x="9" y="8" width="1" height="1" />
+              <rect x="11" y="8" width="5" height="1" />
+              <rect x="17" y="8" width="1" height="1" />
+              <rect x="21" y="8" width="3" height="1" />
+              <rect x="25" y="8" width="1" height="1" />
+              <rect x="31" y="8" width="1" height="1" />
+              <rect x="3" y="9" width="7" height="1" />
+              <rect x="11" y="9" width="1" height="1" />
+              <rect x="13" y="9" width="1" height="1" />
+              <rect x="15" y="9" width="1" height="1" />
+              <rect x="17" y="9" width="1" height="1" />
+              <rect x="19" y="9" width="1" height="1" />
+              <rect x="21" y="9" width="1" height="1" />
+              <rect x="23" y="9" width="1" height="1" />
+              <rect x="25" y="9" width="7" height="1" />
+              <rect x="11" y="10" width="1" height="1" />
+              <rect x="16" y="10" width="2" height="1" />
+              <rect x="20" y="10" width="2" height="1" />
+              <rect x="23" y="10" width="1" height="1" />
+              <rect x="3" y="11" width="2" height="1" />
+              <rect x="6" y="11" width="1" height="1" />
+              <rect x="9" y="11" width="2" height="1" />
+              <rect x="12" y="11" width="1" height="1" />
+              <rect x="16" y="11" width="2" height="1" />
+              <rect x="19" y="11" width="1" height="1" />
+              <rect x="21" y="11" width="1" height="1" />
+              <rect x="23" y="11" width="1" height="1" />
+              <rect x="25" y="11" width="2" height="1" />
+              <rect x="28" y="11" width="2" height="1" />
+              <rect x="31" y="11" width="1" height="1" />
+              <rect x="3" y="12" width="1" height="1" />
+              <rect x="5" y="12" width="1" height="1" />
+              <rect x="7" y="12" width="1" height="1" />
+              <rect x="15" y="12" width="1" height="1" />
+              <rect x="18" y="12" width="2" height="1" />
+              <rect x="22" y="12" width="2" height="1" />
+              <rect x="25" y="12" width="3" height="1" />
+              <rect x="31" y="12" width="1" height="1" />
+              <rect x="3" y="13" width="3" height="1" />
+              <rect x="7" y="13" width="1" height="1" />
+              <rect x="9" y="13" width="1" height="1" />
+              <rect x="15" y="13" width="1" height="1" />
+              <rect x="17" y="13" width="1" height="1" />
+              <rect x="21" y="13" width="1" height="1" />
+              <rect x="29" y="13" width="2" height="1" />
+              <rect x="4" y="14" width="2" height="1" />
+              <rect x="10" y="14" width="1" height="1" />
+              <rect x="16" y="14" width="4" height="1" />
+              <rect x="21" y="14" width="1" height="1" />
+              <rect x="23" y="14" width="2" height="1" />
+              <rect x="26" y="14" width="2" height="1" />
+              <rect x="31" y="14" width="1" height="1" />
+              <rect x="3" y="15" width="2" height="1" />
+              <rect x="6" y="15" width="1" height="1" />
+              <rect x="9" y="15" width="2" height="1" />
+              <rect x="13" y="15" width="3" height="1" />
+              <rect x="19" y="15" width="1" height="1" />
+              <rect x="23" y="15" width="2" height="1" />
+              <rect x="28" y="15" width="2" height="1" />
+              <rect x="3" y="16" width="4" height="1" />
+              <rect x="8" y="16" width="1" height="1" />
+              <rect x="10" y="16" width="2" height="1" />
+              <rect x="13" y="16" width="4" height="1" />
+              <rect x="19" y="16" width="1" height="1" />
+              <rect x="21" y="16" width="3" height="1" />
+              <rect x="25" y="16" width="1" height="1" />
+              <rect x="29" y="16" width="3" height="1" />
+              <rect x="4" y="17" width="1" height="1" />
+              <rect x="7" y="17" width="7" height="1" />
+              <rect x="17" y="17" width="1" height="1" />
+              <rect x="19" y="17" width="1" height="1" />
+              <rect x="22" y="17" width="3" height="1" />
+              <rect x="27" y="17" width="1" height="1" />
+              <rect x="29" y="17" width="3" height="1" />
+              <rect x="6" y="18" width="3" height="1" />
+              <rect x="10" y="18" width="1" height="1" />
+              <rect x="13" y="18" width="1" height="1" />
+              <rect x="16" y="18" width="1" height="1" />
+              <rect x="18" y="18" width="2" height="1" />
+              <rect x="21" y="18" width="1" height="1" />
+              <rect x="23" y="18" width="3" height="1" />
+              <rect x="27" y="18" width="1" height="1" />
+              <rect x="30" y="18" width="1" height="1" />
+              <rect x="4" y="19" width="1" height="1" />
+              <rect x="7" y="19" width="1" height="1" />
+              <rect x="9" y="19" width="1" height="1" />
+              <rect x="11" y="19" width="2" height="1" />
+              <rect x="14" y="19" width="1" height="1" />
+              <rect x="20" y="19" width="2" height="1" />
+              <rect x="24" y="19" width="1" height="1" />
+              <rect x="27" y="19" width="2" height="1" />
+              <rect x="30" y="19" width="1" height="1" />
+              <rect x="4" y="20" width="1" height="1" />
+              <rect x="6" y="20" width="3" height="1" />
+              <rect x="10" y="20" width="1" height="1" />
+              <rect x="12" y="20" width="3" height="1" />
+              <rect x="16" y="20" width="1" height="1" />
+              <rect x="20" y="20" width="1" height="1" />
+              <rect x="26" y="20" width="1" height="1" />
+              <rect x="28" y="20" width="3" height="1" />
+              <rect x="3" y="21" width="1" height="1" />
+              <rect x="5" y="21" width="1" height="1" />
+              <rect x="9" y="21" width="3" height="1" />
+              <rect x="13" y="21" width="3" height="1" />
+              <rect x="18" y="21" width="1" height="1" />
+              <rect x="23" y="21" width="1" height="1" />
+              <rect x="26" y="21" width="1" height="1" />
+              <rect x="29" y="21" width="1" height="1" />
+              <rect x="5" y="22" width="1" height="1" />
+              <rect x="12" y="22" width="4" height="1" />
+              <rect x="20" y="22" width="3" height="1" />
+              <rect x="24" y="22" width="2" height="1" />
+              <rect x="27" y="22" width="1" height="1" />
+              <rect x="29" y="22" width="1" height="1" />
+              <rect x="4" y="23" width="1" height="1" />
+              <rect x="6" y="23" width="4" height="1" />
+              <rect x="11" y="23" width="1" height="1" />
+              <rect x="13" y="23" width="4" height="1" />
+              <rect x="18" y="23" width="2" height="1" />
+              <rect x="21" y="23" width="1" height="1" />
+              <rect x="23" y="23" width="7" height="1" />
+              <rect x="11" y="24" width="3" height="1" />
+              <rect x="16" y="24" width="2" height="1" />
+              <rect x="19" y="24" width="1" height="1" />
+              <rect x="21" y="24" width="1" height="1" />
+              <rect x="23" y="24" width="1" height="1" />
+              <rect x="27" y="24" width="5" height="1" />
+              <rect x="3" y="25" width="7" height="1" />
+              <rect x="11" y="25" width="3" height="1" />
+              <rect x="15" y="25" width="2" height="1" />
+              <rect x="22" y="25" width="2" height="1" />
+              <rect x="25" y="25" width="1" height="1" />
+              <rect x="27" y="25" width="2" height="1" />
+              <rect x="30" y="25" width="1" height="1" />
+              <rect x="3" y="26" width="1" height="1" />
+              <rect x="9" y="26" width="1" height="1" />
+              <rect x="12" y="26" width="3" height="1" />
+              <rect x="19" y="26" width="1" height="1" />
+              <rect x="21" y="26" width="3" height="1" />
+              <rect x="27" y="26" width="2" height="1" />
+              <rect x="30" y="26" width="1" height="1" />
+              <rect x="3" y="27" width="1" height="1" />
+              <rect x="5" y="27" width="3" height="1" />
+              <rect x="9" y="27" width="1" height="1" />
+              <rect x="17" y="27" width="1" height="1" />
+              <rect x="20" y="27" width="1" height="1" />
+              <rect x="23" y="27" width="5" height="1" />
+              <rect x="29" y="27" width="2" height="1" />
+              <rect x="3" y="28" width="1" height="1" />
+              <rect x="5" y="28" width="3" height="1" />
+              <rect x="9" y="28" width="1" height="1" />
+              <rect x="11" y="28" width="1" height="1" />
+              <rect x="13" y="28" width="1" height="1" />
+              <rect x="16" y="28" width="9" height="1" />
+              <rect x="26" y="28" width="3" height="1" />
+              <rect x="31" y="28" width="1" height="1" />
+              <rect x="3" y="29" width="1" height="1" />
+              <rect x="5" y="29" width="3" height="1" />
+              <rect x="9" y="29" width="1" height="1" />
+              <rect x="13" y="29" width="5" height="1" />
+              <rect x="26" y="29" width="1" height="1" />
+              <rect x="29" y="29" width="1" height="1" />
+              <rect x="31" y="29" width="1" height="1" />
+              <rect x="3" y="30" width="1" height="1" />
+              <rect x="9" y="30" width="1" height="1" />
+              <rect x="11" y="30" width="3" height="1" />
+              <rect x="17" y="30" width="1" height="1" />
+              <rect x="19" y="30" width="1" height="1" />
+              <rect x="23" y="30" width="1" height="1" />
+              <rect x="25" y="30" width="1" height="1" />
+              <rect x="28" y="30" width="1" height="1" />
+              <rect x="30" y="30" width="1" height="1" />
+              <rect x="3" y="31" width="7" height="1" />
+              <rect x="11" y="31" width="1" height="1" />
+              <rect x="16" y="31" width="2" height="1" />
+              <rect x="21" y="31" width="3" height="1" />
+              <rect x="30" y="31" width="1" height="1" />
+            </g>
+          </svg></div>
+        <a class="signin-link" href="https://forms.gle/57y7YUWXMCqghhDZA" target="_blank" rel="noopener">
+          就用這台裝置開表單 ↗
+        </a>
+        <p class="signin-url">forms.gle/57y7YUWXMCqghhDZA</p>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="hero">
+      <div class="kicker">Autodesk University 2026 · Sep 15–17 · Las Vegas</div>
+      <h1>AU 2026 選課工具總覽</h1>
+      <p>整場大會共 <b>528 場</b>議程。這裡放的是<b>徐灝老師</b>與<b>任遠老師</b>各自做的幾套挑課工具 ——
+        <b>先看下面「你是哪一種參加者」</b>，照著那一欄的順序用就好，不用每個工具都打開。
+        所有工具都是單一 HTML、免安裝、選擇只存在你自己的瀏覽器。
+      </p>
+    </div>
+
+    <div class="facts">
+      <div class="fact">
+        <div class="n">528</div>
+        <div class="l">總場次</div>
+      </div>
+      <div class="fact ip">
+        <div class="n">342</div>
+        <div class="l">現場限定<br>沒有線上版</div>
+      </div>
+      <div class="fact dg">
+        <div class="n">186</div>
+        <div class="l">線上也播<br>數位 Pass 看得到</div>
+      </div>
+      <div class="fact lv">
+        <div class="n">53</div>
+        <div class="l">固定時段直播<br>要卡台北時間</div>
+      </div>
+      <div class="fact od">
+        <div class="n">121</div>
+        <div class="l">隨選<br>期間內隨時看</div>
+      </div>
+      <div class="fact">
+        <div class="n">42</div>
+        <div class="l">Hands-on Lab<br>需另外預約</div>
+      </div>
+    </div>
+
+    <h2>你是哪一種參加者</h2>
+    <div class="pick">
+      <div class="lane lane--onsite">
+        <h3>飛去現場的人</h3>
+        <div class="who">人在 Venetian，時段是稀缺資源 —— 重點是「不要把現場時段浪費在線上也看得到的課」。</div>
+        <ol>
+          <li><a href="./onsite.html">現場參加者行程表</a><span class="why"> —— 主力工具。489 場現場可參加的課，橘色是現場限定要優先卡，藍色是線上也有可以事後補。按 ＋
+              排三天行程，撞期會標紅。</span></li>
+          <li><a href="./planner.html">全議程 Planner (EN)</a><span class="why"> —— 想看英文原始資料、或要用 Topic／Format
+              大範圍掃時用。</span></li>
+          <li><a href="./digital-guide.html">數位 Pass 指南</a><span class="why"> —— 回台灣後補看線上場次時再開。</span></li>
+        </ol>
+      </div>
+      <div class="lane lane--remote">
+        <h3>只在台灣看線上的人</h3>
+        <div class="who">整場大會落在台北時間深夜到清晨 —— 重點是「只為真正卡死時段的那幾場熬夜」。</div>
+        <ol>
+          <li><a href="./digital-guide.html">數位 Pass 指南</a><span class="why"> —— 主力工具。174 場全部換成台北時間，紅色的 53
+              場是固定時段直播、要卡時間，綠色的 121 場隨選、白天再看就好。</span></li>
+          <li><a href="./planner-tw.html">台北時間選課台</a><span class="why"> —— 想看中譯課名、或想用可拖曳的三日課表排班時用。</span></li>
+          <li><a href="https://au2026.vercel.app/" target="_blank" rel="noopener">AI 選課顧問</a><span class="why"> —— 用
+              Gemini AI 對話式選課，說出職業需求，AI 直接推薦必看議程。需自備 Gemini API Key（免費）。</span></li>
+          <li><a href="./AU2026_%E6%8C%91%E8%AA%B2%E5%B7%A5%E5%85%B7.html">徐灝老師的挑課工具</a><span class="why"> —— 要把篩選結果匯出成
+              CSV 交給別人時用。</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <h2>全部工具</h2>
+    <div class="tools">
+      <a class="tool t-ip" href="./onsite.html">
+        <div class="tag">現場</div>
+        <h3>現場參加者行程表</h3>
+        <p>現場能參加的議程依三天 → 時段排列，直接勾出自己的行程。</p>
+        <ul>
+          <li>三色分流：現場限定 / 線上隨選 / 線上直播時段</li>
+          <li>同時段選超過一場會標紅提醒</li>
+          <li>拉斯維加斯時間＋台北時間雙欄</li>
+          <li>Hands-on Lab、AIA 學分標記</li>
+          <li>「我的行程」可一鍵複製成純文字</li>
+        </ul>
+        <span class="go">開啟 →</span>
       </a>
-      <p class="signin-url">forms.gle/57y7YUWXMCqghhDZA</p>
+
+      <a class="tool t-dg" href="./digital-guide.html">
+        <div class="tag">線上</div>
+        <h3>數位 Pass 觀看指南</h3>
+        <p>174 場數位議程，全部換算台北時間，一眼分出哪些要卡時段、哪些可以隨時看。</p>
+        <ul>
+          <li>固定時段直播 53 場 vs 隨選 121 場分色</li>
+          <li>依台北時段（凌晨／清晨／晚間）篩選</li>
+          <li>可搜尋講者、摘要、產品、Track</li>
+          <li>★ 收藏清單可複製成純文字</li>
+        </ul>
+        <span class="go">開啟 →</span>
+      </a>
+
+      <a class="tool t-en" href="./planner.html">
+        <div class="tag">全議程 · 英文</div>
+        <h3>AU 2026 Session Planner</h3>
+        <p>528 場完整議程，依日期 → 時段分組，Digital／In-person 對照。原始基準資料。</p>
+        <ul>
+          <li>Topic／Format／AI 主題多重篩選</li>
+          <li>173 場數位議程可展開看講者與完整摘要</li>
+          <li>可直接連到官方議程頁</li>
+          <li>「固定時段直播」「官方精選」快速篩選</li>
+        </ul>
+        <span class="go">開啟 →</span>
+        <div class="by">整理：江碩濤</div>
+      </a>
+
+      <a class="tool t-tw" href="./planner-tw.html">
+        <div class="tag">中譯 · 課表</div>
+        <h3>台北時間選課台</h3>
+        <p>522 場中譯課名，台北時間顯示，附可拖曳的三日課表與撞期偵測。</p>
+        <ul>
+          <li>全數中譯課名（英文原名保留在下方）</li>
+          <li>主修／輔修兩欄式課表</li>
+          <li>「實踐強度」啟發式標記，過濾產品宣傳場</li>
+          <li>手機版預設單日檢視</li>
+        </ul>
+        <span class="go">開啟 →</span>
+        <div class="by">製作：任遠老師</div>
+      </a>
+
+      <a class="tool t-hh" href="./AU2026_%E6%8C%91%E8%AA%B2%E5%B7%A5%E5%85%B7.html">
+        <div class="tag">數位 · CSV</div>
+        <h3>徐灝老師版 數位 Pass 挑課工具</h3>
+        <p>174 場數位議程的完整原始表，欄位最齊，適合要把結果匯出給別人的情境。</p>
+        <ul>
+          <li>Day／Mode／Type／Track 下拉篩選</li>
+          <li>Featured 精選、收藏標記</li>
+          <li>一鍵匯出目前篩選結果為 CSV</li>
+          <li>另有 Markdown 版全表（AU2026_數位Pass_Session整理.md）</li>
+        </ul>
+        <span class="go">開啟 →</span>
+        <div class="by">製作：徐灝老師</div>
+      </a>
+
+      <a class="tool t-ai" href="https://au2026.vercel.app/" target="_blank" rel="noopener">
+        <div class="tag">AI Vibe Coding</div>
+        <h3>選課救星</h3>
+        <p>174 場數位議程全覽庫＋ Gemini AI 對話選課，說出職業需求，AI 直接推薦必看議程並附説明理由。</p>
+        <ul>
+          <li>AI 對話推薦：說需求，AI 選課</li>
+          <li>174 場數位議程全覽庫，可篩選收藏</li>
+          <li>匯入 Autodesk 官方已選課表 (CSV)</li>
+          <li>需自備 Gemini API Key（免費申請：aistudio.google.com）</li>
+        </ul>
+        <span class="go">開啟 ↗</span>
+        <div class="by">製作：呂啟銘</div>
+      </a>
     </div>
-  </div>
-</div>
 
-<main>
-  <div class="hero">
-    <div class="kicker">Autodesk University 2026 · Sep 15–17 · Las Vegas</div>
-    <h1>AU 2026 選課工具總覽</h1>
-    <p>整場大會共 <b>528 場</b>議程。這裡放的是<b>徐灝老師</b>與<b>任遠老師</b>各自做的幾套挑課工具 ——
-       <b>先看下面「你是哪一種參加者」</b>，照著那一欄的順序用就好，不用每個工具都打開。
-       所有工具都是單一 HTML、免安裝、選擇只存在你自己的瀏覽器。</p>
-  </div>
-
-  <div class="facts">
-    <div class="fact"><div class="n">528</div><div class="l">總場次</div></div>
-    <div class="fact ip"><div class="n">342</div><div class="l">現場限定<br>沒有線上版</div></div>
-    <div class="fact dg"><div class="n">186</div><div class="l">線上也播<br>數位 Pass 看得到</div></div>
-    <div class="fact lv"><div class="n">53</div><div class="l">固定時段直播<br>要卡台北時間</div></div>
-    <div class="fact od"><div class="n">121</div><div class="l">隨選<br>期間內隨時看</div></div>
-    <div class="fact"><div class="n">42</div><div class="l">Hands-on Lab<br>需另外預約</div></div>
-  </div>
-
-  <h2>你是哪一種參加者</h2>
-  <div class="pick">
-    <div class="lane lane--onsite">
-      <h3>飛去現場的人</h3>
-      <div class="who">人在 Venetian，時段是稀缺資源 —— 重點是「不要把現場時段浪費在線上也看得到的課」。</div>
-      <ol>
-        <li><a href="./onsite.html">現場參加者行程表</a><span class="why"> —— 主力工具。489 場現場可參加的課，橘色是現場限定要優先卡，藍色是線上也有可以事後補。按 ＋ 排三天行程，撞期會標紅。</span></li>
-        <li><a href="./planner.html">全議程 Planner (EN)</a><span class="why"> —— 想看英文原始資料、或要用 Topic／Format 大範圍掃時用。</span></li>
-        <li><a href="./digital-guide.html">數位 Pass 指南</a><span class="why"> —— 回台灣後補看線上場次時再開。</span></li>
-      </ol>
+    <h2>資料與注意事項</h2>
+    <div class="note">
+      <b>資料來源與時間。</b>議程資料 2026-09-09 擷取自
+      <a href="https://conferences.autodesk.com/flow/autodesk/au2026/web/page/overview" target="_blank"
+        rel="noopener">官方 AU 2026 議程目錄</a>。
+      大會時間為拉斯維加斯 <code>PDT (UTC−7)</code>，台北時間一律是 <code>+15 小時</code> 換算。
+      官方隨時可能加場、改時間或換講者 —— <b>真正要報名或到場前，請以官方議程頁為準</b>，每張卡片都可以直接連過去。
+      <br><br>
+      <b>幾個標記的意思。</b>「現場限定」= 這場在本 planner 標為 In-person only，沒有線上版本；
+      「固定時段直播」= 官方數位目錄歸在 Live-streamed，有指定的開播時間；「隨選」= 歸在 On-demand，活動期間內可看。
+      <b>官方目錄沒有載明直播場次事後是否提供重播</b>，本站也不做這個推論 —— 要確認請點各卡片的官方議程連結。
+      <a href="./planner-tw.html">台北時間選課台</a>的中譯課名與「實踐強度」是社群整理，不是官方翻譯或官方分類。
+      <br><br>
+      <b>兩份資料的差異。</b>本站同時用了兩份 2026-09-09 擷取的資料：本 planner 的 528 場全議程
+      （其中 186 場標為線上也播），以及官方數位目錄的 174 場（直播 53／隨選 121）。
+      有 13 場在 planner 標為線上、但不在數位目錄裡，這些場次的線上播出方式沒有依據，站上會標成「目錄未收錄」而不是猜測。
+      <br><br>
+      <b>你的選擇存在哪裡。</b>所有工具的勾選／收藏都只寫進<b>你自己瀏覽器的 localStorage</b>，沒有後端、不會上傳、換一台電腦不會同步。
+      要把行程給別人看，用各頁的「複製行程／複製清單」按鈕匯出純文字。
     </div>
-    <div class="lane lane--remote">
-      <h3>只在台灣看線上的人</h3>
-      <div class="who">整場大會落在台北時間深夜到清晨 —— 重點是「只為真正卡死時段的那幾場熬夜」。</div>
-      <ol>
-        <li><a href="./digital-guide.html">數位 Pass 指南</a><span class="why"> —— 主力工具。174 場全部換成台北時間，紅色的 53 場是固定時段直播、要卡時間，綠色的 121 場隨選、白天再看就好。</span></li>
-        <li><a href="./planner-tw.html">台北時間選課台</a><span class="why"> —— 想看中譯課名、或想用可拖曳的三日課表排班時用。</span></li>
-        <li><a href="./AU2026_%E6%8C%91%E8%AA%B2%E5%B7%A5%E5%85%B7.html">徐灝老師的挑課工具</a><span class="why"> —— 要把篩選結果匯出成 CSV 交給別人時用。</span></li>
-      </ol>
-    </div>
-  </div>
+  </main>
 
-  <h2>全部工具</h2>
-  <div class="tools">
-    <a class="tool t-ip" href="./onsite.html">
-      <div class="tag">現場</div>
-      <h3>現場參加者行程表</h3>
-      <p>現場能參加的議程依三天 → 時段排列，直接勾出自己的行程。</p>
-      <ul>
-        <li>三色分流：現場限定 / 線上隨選 / 線上直播時段</li>
-        <li>同時段選超過一場會標紅提醒</li>
-        <li>拉斯維加斯時間＋台北時間雙欄</li>
-        <li>Hands-on Lab、AIA 學分標記</li>
-        <li>「我的行程」可一鍵複製成純文字</li>
-      </ul>
-      <span class="go">開啟 →</span>
-    </a>
+  <footer>
+    AU 2026 選課工具 · <a href="https://github.com/shuotao/au2026" target="_blank"
+      rel="noopener">github.com/shuotao/au2026</a> ·
+    歡迎直接開 PR 補資料或加工具。
+  </footer>
 
-    <a class="tool t-dg" href="./digital-guide.html">
-      <div class="tag">線上</div>
-      <h3>數位 Pass 觀看指南</h3>
-      <p>174 場數位議程，全部換算台北時間，一眼分出哪些要卡時段、哪些可以隨時看。</p>
-      <ul>
-        <li>固定時段直播 53 場 vs 隨選 121 場分色</li>
-        <li>依台北時段（凌晨／清晨／晚間）篩選</li>
-        <li>可搜尋講者、摘要、產品、Track</li>
-        <li>★ 收藏清單可複製成純文字</li>
-      </ul>
-      <span class="go">開啟 →</span>
-    </a>
-
-    <a class="tool t-en" href="./planner.html">
-      <div class="tag">全議程 · 英文</div>
-      <h3>AU 2026 Session Planner</h3>
-      <p>528 場完整議程，依日期 → 時段分組，Digital／In-person 對照。原始基準資料。</p>
-      <ul>
-        <li>Topic／Format／AI 主題多重篩選</li>
-        <li>173 場數位議程可展開看講者與完整摘要</li>
-        <li>可直接連到官方議程頁</li>
-        <li>「固定時段直播」「官方精選」快速篩選</li>
-      </ul>
-      <span class="go">開啟 →</span>
-      <div class="by">整理：江碩濤</div>
-    </a>
-
-    <a class="tool t-tw" href="./planner-tw.html">
-      <div class="tag">中譯 · 課表</div>
-      <h3>台北時間選課台</h3>
-      <p>522 場中譯課名，台北時間顯示，附可拖曳的三日課表與撞期偵測。</p>
-      <ul>
-        <li>全數中譯課名（英文原名保留在下方）</li>
-        <li>主修／輔修兩欄式課表</li>
-        <li>「實踐強度」啟發式標記，過濾產品宣傳場</li>
-        <li>手機版預設單日檢視</li>
-      </ul>
-      <span class="go">開啟 →</span>
-      <div class="by">製作：任遠老師</div>
-    </a>
-
-    <a class="tool t-hh" href="./AU2026_%E6%8C%91%E8%AA%B2%E5%B7%A5%E5%85%B7.html">
-      <div class="tag">數位 · CSV</div>
-      <h3>徐灝老師版 數位 Pass 挑課工具</h3>
-      <p>174 場數位議程的完整原始表，欄位最齊，適合要把結果匯出給別人的情境。</p>
-      <ul>
-        <li>Day／Mode／Type／Track 下拉篩選</li>
-        <li>Featured 精選、收藏標記</li>
-        <li>一鍵匯出目前篩選結果為 CSV</li>
-        <li>另有 <a href="./AU2026_%E6%95%B8%E4%BD%8DPass_Session%E6%95%B4%E7%90%86.md">Markdown 版全表</a></li>
-      </ul>
-      <span class="go">開啟 →</span>
-      <div class="by">製作：徐灝老師</div>
-    </a>
-  </div>
-
-  <h2>資料與注意事項</h2>
-  <div class="note">
-    <b>資料來源與時間。</b>議程資料 2026-09-09 擷取自
-    <a href="https://conferences.autodesk.com/flow/autodesk/au2026/web/page/overview" target="_blank" rel="noopener">官方 AU 2026 議程目錄</a>。
-    大會時間為拉斯維加斯 <code>PDT (UTC−7)</code>，台北時間一律是 <code>+15 小時</code> 換算。
-    官方隨時可能加場、改時間或換講者 —— <b>真正要報名或到場前，請以官方議程頁為準</b>，每張卡片都可以直接連過去。
-    <br><br>
-    <b>幾個標記的意思。</b>「現場限定」= 這場在本 planner 標為 In-person only，沒有線上版本；
-    「固定時段直播」= 官方數位目錄歸在 Live-streamed，有指定的開播時間；「隨選」= 歸在 On-demand，活動期間內可看。
-    <b>官方目錄沒有載明直播場次事後是否提供重播</b>，本站也不做這個推論 —— 要確認請點各卡片的官方議程連結。
-    <a href="./planner-tw.html">台北時間選課台</a>的中譯課名與「實踐強度」是社群整理，不是官方翻譯或官方分類。
-    <br><br>
-    <b>兩份資料的差異。</b>本站同時用了兩份 2026-09-09 擷取的資料：本 planner 的 528 場全議程
-    （其中 186 場標為線上也播），以及官方數位目錄的 174 場（直播 53／隨選 121）。
-    有 13 場在 planner 標為線上、但不在數位目錄裡，這些場次的線上播出方式沒有依據，站上會標成「目錄未收錄」而不是猜測。
-    <br><br>
-    <b>你的選擇存在哪裡。</b>所有工具的勾選／收藏都只寫進<b>你自己瀏覽器的 localStorage</b>，沒有後端、不會上傳、換一台電腦不會同步。
-    要把行程給別人看，用各頁的「複製行程／複製清單」按鈕匯出純文字。
-  </div>
-</main>
-
-<footer>
-  AU 2026 選課工具 · <a href="https://github.com/shuotao/au2026" target="_blank" rel="noopener">github.com/shuotao/au2026</a> ·
-  歡迎直接開 PR 補資料或加工具。
-</footer>
-
-<script>
-(function(){
-  var r=document.documentElement;
-  try{var s=localStorage.getItem("au2026theme"); if(s)r.setAttribute("data-theme",s);}catch(e){}
-  var b=document.getElementById("theme");
-  if(b)b.onclick=function(){
-    var cur=r.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
-    var next=cur==="dark"?"light":"dark";
-    r.setAttribute("data-theme",next);
-    try{localStorage.setItem("au2026theme",next);}catch(e){}
-  };
-})();
-</script>
-<script>
-(function(){
-  var btn=document.getElementById("signinBtn"),
-      panel=document.getElementById("signinPanel"),
-      closeBtn=document.getElementById("signinClose");
-  if(!btn||!panel)return;
-  function setOpen(open){
-    panel.hidden=!open;
-    btn.setAttribute("aria-expanded",open?"true":"false");
-    if(open){var f=panel.querySelector("a,button");if(f)f.focus();}
-  }
-  btn.addEventListener("click",function(e){e.stopPropagation();setOpen(panel.hidden);});
-  if(closeBtn)closeBtn.addEventListener("click",function(){setOpen(false);btn.focus();});
-  document.addEventListener("click",function(e){
-    if(panel.hidden)return;
-    if(!panel.contains(e.target)&&!btn.contains(e.target))setOpen(false);
-  });
-  document.addEventListener("keydown",function(e){
-    if(e.key==="Escape"&&!panel.hidden){setOpen(false);btn.focus();}
-  });
-})();
-</script>
+  <script>
+    (function () {
+      var r = document.documentElement;
+      try { var s = localStorage.getItem("au2026theme"); if (s) r.setAttribute("data-theme", s); } catch (e) { }
+      var b = document.getElementById("theme");
+      if (b) b.onclick = function () {
+        var cur = r.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
+        var next = cur === "dark" ? "light" : "dark";
+        r.setAttribute("data-theme", next);
+        try { localStorage.setItem("au2026theme", next); } catch (e) { }
+      };
+    })();
+  </script>
+  <script>
+    (function () {
+      var btn = document.getElementById("signinBtn"),
+        panel = document.getElementById("signinPanel"),
+        closeBtn = document.getElementById("signinClose");
+      if (!btn || !panel) return;
+      function setOpen(open) {
+        panel.hidden = !open;
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+        if (open) { var f = panel.querySelector("a,button"); if (f) f.focus(); }
+      }
+      btn.addEventListener("click", function (e) { e.stopPropagation(); setOpen(panel.hidden); });
+      if (closeBtn) closeBtn.addEventListener("click", function () { setOpen(false); btn.focus(); });
+      document.addEventListener("click", function (e) {
+        if (panel.hidden) return;
+        if (!panel.contains(e.target) && !btn.contains(e.target)) setOpen(false);
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !panel.hidden) { setOpen(false); btn.focus(); }
+      });
+    })();
+  </script>
 </body>
+
 </html>
