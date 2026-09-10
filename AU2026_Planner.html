@@ -1,4 +1,8 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AU 2026 Session Planner</title>
 <style>
 :root{
@@ -104,7 +108,18 @@ main{padding:14px 16px 60px;max-width:1180px;margin:0 auto}
 [hidden]{display:none!important}
 #picksOut .grid{grid-template-columns:repeat(auto-fill,minmax(min(310px,100%),1fr));align-items:start}
 #pageNav a:focus-visible,#picksControls .chip:focus-visible,#picksReset:focus-visible,.pick-details summary:focus-visible,.pick-details a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* the theme button is absolutely positioned top-right; now that the page actually
+   honours the viewport width, the h1 would wrap underneath it on phones */
+@media (max-width:520px){
+  h1{padding-right:88px;font-size:16px}
+  header{padding:10px 12px 8px}
+  main{padding:12px 12px 60px}
+  .grid{grid-template-columns:1fr}
+  .themebtn{top:10px;right:12px}
+}
 </style>
+</head>
+<body>
 
 <nav class="aunav">
   <span class="brand">AU 2026</span>
@@ -125,7 +140,7 @@ main{padding:14px 16px 60px;max-width:1180px;margin:0 auto}
     <a id="picksTab" class="chip" href="#picks99" aria-controls="picksPage">選課 99</a>
   </nav>
   <div id="plannerControls">
-    <div class="tagline">522 sessions · <span style="color:var(--dig);font-weight:600">Digital 180</span> (watch anytime) · <span style="color:var(--ip);font-weight:600">In-person only 342</span> (must attend live; digital duplicates removed) · grouped by day → time slot · <span class="count" id="count"></span> shown<br><b style="color:var(--dig)">New:</b> 173 digital sessions now carry speakers, abstract, track and the official catalog link — cards marked <span class="b det" style="font-size:10px">detail</span> are clickable.</div>
+    <div class="tagline">528 sessions · <span style="color:var(--dig);font-weight:600">Digital 186</span> (also on the digital pass) · <span style="color:var(--ip);font-weight:600">In-person only 342</span> (not streamed) · grouped by day → time slot · <span class="count" id="count"></span> shown<br><b style="color:var(--dig)">New:</b> 173 digital sessions now carry speakers, abstract, track and the official catalog link — cards marked <span class="b det" style="font-size:10px">detail</span> are clickable.</div>
     <div class="controls">
       <div class="grp"><span class="lbl">Search</span><input type="search" id="q" placeholder="title, code, speaker, abstract…"></div>
       <div class="grp"><span class="lbl">Source</span><div class="chips" id="fSrc"></div></div>
@@ -182,7 +197,9 @@ main{padding:14px 16px 60px;max-width:1180px;margin:0 auto}
   </section>
   <section id="picksPage" aria-labelledby="picksTab" lang="zh-TW" hidden>
     <div class="legend">
-      依活動日期與開始時間排列；同時段數量以全部精選課程計算，包含目前被篩除的課程。
+      <b>由江碩濤挑選，中文摘要為 AI 輔助整理，僅供參考。</b>課名、時間與場地以
+      <a href="https://conferences.autodesk.com/flow/autodesk/au2026/web/page/overview" target="_blank" rel="noopener">官方議程目錄</a>為準。
+      <br>依活動日期與開始時間排列；同時段數量以全部精選課程計算，包含目前被篩除的課程。
     </div>
     <div id="picksOut"></div>
     <div id="picksEmpty" class="empty" hidden>沒有符合篩選條件的課程。</div>
@@ -231,7 +248,7 @@ chip(fAI,"AI-focused only",false,c=>{state.ai=!state.ai;c.classList.toggle("on")
 // HH digital detail
 chip(fHH,"Has abstract/speakers",false,c=>{state.det=!state.det;c.classList.toggle("on")},"det");
 chip(fHH,"★ Featured",false,c=>{state.star=!state.star;c.classList.toggle("on")},"star");
-chip(fHH,"Live only (no replay)",false,c=>{state.liveonly=!state.liveonly;c.classList.toggle("on")},"det");
+chip(fHH,"Live-streamed (fixed time)",false,c=>{state.liveonly=!state.liveonly;c.classList.toggle("on")},"det");
 // format
 FORMATS.forEach(f=>chip(fFmt,f,true,c=>tog(state.fmt,f,c)));
 // topic
@@ -288,7 +305,7 @@ function render(){
         const h=HHD[d.code];
         if(h){
           if(h.feat)b+='<span class="b star">★ Featured</span>';
-          if(h.mode==="Live")b+='<span class="b live">live only — no replay</span>';
+          if(h.mode==="Live")b+='<span class="b live">live-streamed · fixed time</span>';
           b+='<span class="b det">detail</span>';
           c.classList.add("has-d");c.dataset.code=d.code;
         }
@@ -607,3 +624,5 @@ renderPicks();
 window.addEventListener("hashchange",syncPageFromHash);
 syncPageFromHash();
 </script>
+</body>
+</html>
