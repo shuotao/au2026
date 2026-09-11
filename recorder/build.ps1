@@ -24,8 +24,11 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 if ($Clean) {
-    Write-Host "清掉舊的 build / dist..." -ForegroundColor Yellow
-    Remove-Item -Recurse -Force build, dist -ErrorAction SilentlyContinue
+    # 只刪 build/：dist/ 由 PyInstaller 自己重建，先刪掉反而可能因為檔案還被
+    # 佔用（剛跑過的 exe、開著的檔案總管）而讓後續打包失敗。
+    Write-Host "清掉舊的 build..." -ForegroundColor Yellow
+    Remove-Item -Recurse -Force build -ErrorAction SilentlyContinue
+    if (Test-Path build) { Write-Host "  ! build 刪不掉（可能有檔案被佔用），繼續" -ForegroundColor Yellow }
 }
 
 $pyiArgs = @(
