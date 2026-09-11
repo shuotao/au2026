@@ -24,6 +24,11 @@
 !AU2026.pdf
 !autodesk_au2026_custom_*.pdf
 
+# PWA 圖示是網站本身的一部分（由 scripts 產生，非個人檔案），要進版控
+!icon-192.png
+!icon-512.png
+!icon-maskable-512.png
+
 # 工作暫存
 src/
 *.tmp
