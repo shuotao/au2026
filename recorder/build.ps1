@@ -57,7 +57,22 @@ $exe = if ($OneFile) { 'dist\au2026rec.exe' } else { 'dist\au2026rec\au2026rec.e
 if (Test-Path $exe) {
     $size = [math]::Round((Get-Item $exe).Length / 1MB, 1)
     Write-Host "`n完成：$exe（$size MB）" -ForegroundColor Green
-    Write-Host "點兩下會出現操作選單；也可以照舊下指令，例如：$exe plan"
+
+    # 把「放在 exe 旁邊才有用」的檔案一起帶過去
+    $outDir = Split-Path $exe -Parent
+    foreach ($f in @('使用說明.md', 'catalog.json')) {
+        if (Test-Path $f) { Copy-Item $f $outDir -Force }
+    }
+
+    Write-Host "`n這個資料夾還需要你自己放兩個檔案：" -ForegroundColor Cyan
+    foreach ($f in @('config.toml', 'my_schedule.csv')) {
+        $mark = if (Test-Path (Join-Path $outDir $f)) { '有' } else { '缺' }
+        $colour = if ($mark -eq '有') { 'Green' } else { 'Yellow' }
+        Write-Host ("  [{0}] {1}" -f $mark, $f) -ForegroundColor $colour
+    }
+    Write-Host "  config.toml    → 點兩下 exe 選 9 可以產生"
+    Write-Host "  my_schedule.csv → 從 AU2026 網站 My Schedule 匯出（見 使用說明.md 第二節）"
+    Write-Host "`n點兩下 exe 會出現操作選單；也可以下指令，例如：$exe plan"
 } else {
     Write-Host "`n打包失敗，沒有產生 $exe" -ForegroundColor Red
     exit 1
