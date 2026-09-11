@@ -540,6 +540,22 @@
       border-top: 1px dashed var(--line)
     }
 
+    /* 第三方站台 + 自備金鑰的提醒，刻意用警示色與卡片其他文字區隔 */
+    .keynote {
+      font-size: 11.5px;
+      line-height: 1.6;
+      color: var(--sub);
+      background: var(--chip);
+      border-left: 3px solid var(--warnline);
+      border-radius: 0 7px 7px 0;
+      padding: 8px 10px;
+      margin: 0 0 11px
+    }
+
+    .keynote b {
+      color: var(--warnline)
+    }
+
     .note {
       border: 1px dashed var(--line);
       border-radius: 11px;
@@ -1062,7 +1078,8 @@
               場是固定時段直播、要卡時間，綠色的 121 場隨選、白天再看就好。</span></li>
           <li><a href="./planner-tw.html">台北時間選課台</a><span class="why"> —— 想看中譯課名、或想用可拖曳的三日課表排班時用。</span></li>
           <li><a href="https://au2026.vercel.app/" target="_blank" rel="noopener">AI 選課顧問</a><span class="why"> —— 用
-              Gemini AI 對話式選課，說出職業需求，AI 直接推薦必看議程。需自備 Gemini API Key（免費）。</span></li>
+              Gemini AI 對話式選課，說出職業需求，AI 直接推薦必看議程。站外服務，需自備 Gemini API
+              Key（免費），金鑰注意事項見下方卡片。</span></li>
           <li><a href="./AU2026_%E6%8C%91%E8%AA%B2%E5%B7%A5%E5%85%B7.html">徐灝老師的挑課工具</a><span class="why"> —— 要把篩選結果匯出成
               CSV 交給別人時用。</span></li>
         </ol>
@@ -1150,6 +1167,10 @@
           <li>匯入 Autodesk 官方已選課表 (CSV)</li>
           <li>需自備 Gemini API Key（免費申請：aistudio.google.com）</li>
         </ul>
+        <p class="keynote"><b>⚠ 要自備 Gemini API Key，而且這是站外服務。</b>
+          金鑰存在你自己的瀏覽器（localStorage），但提問時會經過該站的 Vercel 伺服器再轉送給 Google Gemini。
+          這個網站由呂啟銘維護，不在本工具站的範圍內；金鑰請用免費額度的、不要用綁付款的正式專案，
+          用完可在該站「設定 API Key」裡清除。</p>
         <span class="go">開啟 ↗</span>
         <div class="by">製作：呂啟銘</div>
       </a>
