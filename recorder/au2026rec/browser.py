@@ -355,7 +355,9 @@ class LaunchNavigator(PlaywrightNavigator):
         self.settings.user_data_dir.mkdir(parents=True, exist_ok=True)
         self._playwright = self._sync_playwright()
         # 預設完全不碰視窗大小與位置：你把視窗擺成什麼樣，錄到的就是什麼樣。
-        args: list[str] = []
+        # AutomationControlled 關掉可以降低被登入頁擋下的機率（但不保證有效；
+        # 真的被擋就改用 attach 模式，用一般方式開的瀏覽器登入）。
+        args: list[str] = ["--disable-blink-features=AutomationControlled"]
         if self.settings.window_size is not None:
             args.append("--window-size={},{}".format(*self.settings.window_size))
         if self.settings.window_position is not None:

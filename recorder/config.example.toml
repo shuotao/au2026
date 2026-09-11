@@ -52,7 +52,8 @@ continue_without_obs = false
 # 導頁方式：
 #   launch = 程式自己開一個它控制得到的瀏覽器（推薦）。第一次跑時你在那個視窗
 #            登入 AU2026，登入狀態存在 user_data_dir，之後每場課都導同一個視窗。
-#   attach = 接管你自己用 --remote-debugging-port=9222 開好的瀏覽器。
+#   attach = 接管一個用一般方式開、已經登入的瀏覽器。登入不會被自動化偵測擋下，
+#            用 `au2026rec browser --set-mode` 可以一鍵開好並切換到這個模式。
 #   open   = 只呼叫系統「開這個網址」，零自動化（每場開新分頁）。
 mode = "launch"
 # attach 模式要接的除錯埠

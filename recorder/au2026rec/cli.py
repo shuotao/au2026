@@ -5,7 +5,8 @@
     au2026rec catalog              從挑課工具 HTML 建立 code → 網址 對照表
     au2026rec validate             檢查課表能不能讀、網址有沒有齊
     au2026rec plan                 印出實際錄影時間軸
-    au2026rec login                開瀏覽器手動登入 Autodesk（存進 profile）
+    au2026rec login                程式自己開瀏覽器登入（launch 模式）
+    au2026rec browser --set-mode   用一般方式開瀏覽器登入，之後由程式接管（attach 模式）
     au2026rec probe <url>          印出頁面上的可點元素，用來補 play_selectors
     au2026rec display              列出螢幕、建立錄課場景（螢幕擷取 + 桌面音訊）
     au2026rec obs-doctor           檢查本機 OBS 設定，可自動填入密碼
@@ -23,7 +24,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from au2026rec import __version__, obslocal
-from au2026rec import obsscene
+from au2026rec import browserlaunch, obsscene
 from au2026rec.browser import (
     BrowserError,
     BrowserSettings,
@@ -577,7 +578,22 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
         # ── 6. 登入 ────────────────────────────────────────────────────
         _step(6, total, "登入 AU2026")
-        if _confirm("現在開瀏覽器登入？（登入狀態會記住，之後不用再登）"):
+        print("有兩種方式，效果一樣，差別在登入會不會被擋：\n")
+        print("  1) 程式自己開瀏覽器（launch）")
+        print("     最單純。但程式開的瀏覽器帶自動化特徵，少數登入頁會拒絕登入")
+        print("     （尤其用 Google 帳號登入 Autodesk 時）。")
+        print("  2) 你自己開瀏覽器，程式再接管（attach）")
+        print("     程式用一般方式幫你開一個瀏覽器，你像平常一樣登入，之後才接管。")
+        print("     登入不會被擋，代價是那個視窗要一直開著。\n")
+        print("  建議：先試 1；如果登入頁擋你，就回來改用 2。\n")
+        pick = _ask("選擇", "1")
+
+        if pick.strip() == "2":
+            args.port = browserlaunch.DEFAULT_PORT
+            args.browser = None
+            args.set_mode = True
+            cmd_browser(args)
+        elif _confirm("現在開瀏覽器登入？（登入狀態會記住，之後不用再登）"):
             navigator = _make_navigator(cfg)
             try:
                 _login_prompt(cfg, navigator, closing=True)
@@ -595,6 +611,75 @@ def cmd_setup(args: argparse.Namespace) -> int:
     except KeyboardInterrupt:
         print("\n\n已中斷。已經設定好的部分都留著，隨時可以再跑一次引導設定。")
         return 130
+
+
+def cmd_browser(args: argparse.Namespace) -> int:
+    """用一般方式開瀏覽器並留著除錯埠，讓程式之後接管（attach 模式）。
+
+    Playwright 自己開的瀏覽器帶自動化特徵，有些登入頁會擋。改用這個方式登入
+    就跟平常一樣，程式事後才從除錯埠接上去。
+    """
+    cfg = _load(args)
+    setup_console()
+    setup_logging(None, args.verbose)
+
+    choices = browserlaunch.find_browsers()
+    if not choices:
+        print("找不到任何 Chromium 系瀏覽器（Chrome / Edge / Brave）。")
+        return 1
+
+    port = args.port
+    if browserlaunch.port_is_open(port):
+        print(f"埠號 {port} 已經有瀏覽器在聽了，直接用那一個就好。")
+    else:
+        chosen: browserlaunch.BrowserChoice
+        if args.browser:
+            match = [c for c in choices if c.key == args.browser.lower()]
+            if not match:
+                print(f"這台電腦上找不到 {args.browser}。有的是："
+                      f"{'、'.join(sorted({c.key for c in choices}))}")
+                return 1
+            chosen = match[0]
+        elif len(choices) == 1:
+            chosen = choices[0]
+        else:
+            print("要用哪一個瀏覽器登入？")
+            for number, choice in enumerate(choices, start=1):
+                print(f"  {number}) {choice.name}  {choice.path}")
+            raw = _ask("編號", "1")
+            try:
+                chosen = choices[int(raw) - 1]
+            except (ValueError, IndexError):
+                print("沒有這個編號")
+                return 1
+
+        profile = cfg.resolve("browser", "user_data_dir").parent / "attach-profile"
+        print(f"\n啟動 {chosen.name}（profile：{profile}）…")
+        print("注意：如果這個瀏覽器現在是開著的，新視窗會併進舊程序、不會開除錯埠 ——")
+        print("      請先把它完全關掉（含背景常駐）。")
+        try:
+            browserlaunch.launch(
+                chosen, profile_dir=profile, port=port,
+                url=str(cfg.get("browser", "login_url")),
+            )
+        except browserlaunch.LaunchError as exc:
+            print(f"✗ {exc}")
+            return 1
+        print(f"✓ 瀏覽器已開啟，除錯埠 {port} 就緒")
+
+    print("\n請在那個視窗裡：")
+    print("  1. 登入 Autodesk（這是一般瀏覽器，登入不會被擋）")
+    print("  2. 點進任何一堂課，確認看得到播放頁")
+    print("  3. 把視窗擺到 OBS 要錄的那個螢幕")
+    print("\n**這個瀏覽器要一直開著**，程式靠它導頁。")
+
+    if args.set_mode:
+        config_path = Path(args.config or "config.toml")
+        set_value(config_path, "browser", "mode", '"attach"')
+        set_value(config_path, "browser", "cdp_url", f'"http://localhost:{port}"')
+        print(f"\n✓ 已把設定改成 attach 模式（cdp_url = http://localhost:{port}）")
+        print("  之後開始錄影時，程式會接管這個瀏覽器，不會另外開一個。")
+    return 0
 
 
 def cmd_display(args: argparse.Namespace) -> int:
@@ -961,6 +1046,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_setup.add_argument("--force", action="store_true", help=argparse.SUPPRESS)
     p_setup.set_defaults(func=cmd_setup)
 
+    p_browser = sub.add_parser(
+        "browser", help="用一般方式開瀏覽器並留除錯埠，之後由程式接管（登入不會被擋）"
+    )
+    p_browser.add_argument("--browser", help="chrome / edge / brave（預設讓你選）")
+    p_browser.add_argument("--port", type=int, default=browserlaunch.DEFAULT_PORT)
+    p_browser.add_argument(
+        "--set-mode", action="store_true", help="順便把設定改成 attach 模式"
+    )
+    p_browser.set_defaults(func=cmd_browser)
+
     p_display = sub.add_parser("display", help="列出螢幕並建立專屬的錄課場景")
     p_display.add_argument("--use", type=int, help="用第幾個螢幕（編號取自本指令列出的清單）")
     p_display.add_argument("--scene", help="場景名稱（預設 AU2026 錄課）")
@@ -1003,7 +1098,9 @@ MENU = [
     ("3", "列出螢幕、建立錄課場景", ["display"]),
     ("4", "試錄 8 秒，確認畫面與聲音都正常", ["obs-test", "--record-seconds", "8"]),
     ("5", "檢查課表、看錄影時間軸", ["plan"]),
-    ("6", "開瀏覽器登入 AU2026（登入一次就好）", ["login"]),
+    ("6", "開瀏覽器登入 AU2026（程式自己開，launch 模式）", ["login"]),
+    ("a", "開一般瀏覽器登入、之後由程式接管（attach 模式，登入不會被擋）",
+     ["browser", "--set-mode"]),
     ("7", "▶ 開始排程錄影", ["run"]),
     ("8", "找播放鍵選擇器（需要輸入課程代碼）", ["probe"]),
     ("9", "重新建立課程網址對照表", ["catalog"]),
