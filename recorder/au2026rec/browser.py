@@ -3,7 +3,7 @@
 launch（推薦）
     程式自己開一個它控制得到的瀏覽器，用固定的 profile 目錄記住登入狀態。
     第一次跑的時候你在那個視窗手動登入 AU2026，之後每場課都由程式導同一個視窗。
-    視窗會被擺到你指定的螢幕（window_position）並全螢幕，OBS 錄那個螢幕就好。
+    程式預設不碰視窗大小與位置 —— 你把瀏覽器擺在哪個螢幕、多大，錄到的就是那樣。
 
 attach
     接管你自己開好、已登入的 Chromium 系瀏覽器（Brave / Chrome / Edge），
@@ -49,12 +49,12 @@ class BrowserSettings:
     user_data_dir: Path = Path("browser-profile")
     channel: str = "chrome"
     headless: bool = False
-    window_size: tuple[int, int] = (1920, 1080)
+    window_size: tuple[int, int] | None = None
     window_position: tuple[int, int] | None = None
-    start_fullscreen: bool = True
+    start_fullscreen: bool = False
     settle_seconds: int = 8
     play_selectors: Sequence[str] = field(default_factory=list)
-    fullscreen: bool = True
+    fullscreen: bool = False
     fullscreen_selectors: Sequence[str] = field(default_factory=list)
     dismiss_selectors: Sequence[str] = field(default_factory=list)
     close_page_after: bool = True
@@ -208,6 +208,8 @@ class PlaywrightNavigator(Navigator):
             "navigator": self.label,
         }
         self.goto(url)
+        if self.settings.start_fullscreen:
+            result["window_fullscreen"] = self.force_fullscreen()
         self.dismiss_popups()
         if self.settings.settle_seconds:
             time.sleep(self.settings.settle_seconds)
@@ -244,6 +246,27 @@ class PlaywrightNavigator(Navigator):
             self.page.goto("about:blank", wait_until="domcontentloaded", timeout=15_000)
         except Exception:
             log.debug("導回空白頁失敗", exc_info=True)
+
+    def force_fullscreen(self) -> bool:
+        """用 CDP 把視窗切成全螢幕。
+
+        比按 F11 或播放器的全螢幕鍵可靠：Fullscreen API 要求「使用者手勢」，
+        Playwright 送的合成按鍵不算數，但 CDP 的 Browser.setWindowBounds 不受限制。
+        """
+        if self._context is None or self._page is None:
+            return False
+        try:
+            session = self._context.new_cdp_session(self._page)
+            window = session.send("Browser.getWindowForTarget")
+            session.send(
+                "Browser.setWindowBounds",
+                {"windowId": window["windowId"], "bounds": {"windowState": "fullscreen"}},
+            )
+        except Exception as exc:
+            log.warning("CDP 全螢幕失敗（錄到的畫面會含瀏覽器工具列）：%s", exc)
+            return False
+        log.info("視窗已切成全螢幕")
+        return True
 
     def show_for_login(self, url: str) -> None:
         """開 AU2026 頁面讓使用者登入；登入狀態會留在 profile 目錄裡。"""
@@ -329,14 +352,14 @@ class LaunchNavigator(PlaywrightNavigator):
     label = "程式自己啟動的瀏覽器"
 
     def start(self) -> None:
-        width, height = self.settings.window_size
         self.settings.user_data_dir.mkdir(parents=True, exist_ok=True)
         self._playwright = self._sync_playwright()
-        args = [f"--window-size={width},{height}"]
+        # 預設完全不碰視窗大小與位置：你把視窗擺成什麼樣，錄到的就是什麼樣。
+        args: list[str] = []
+        if self.settings.window_size is not None:
+            args.append("--window-size={},{}".format(*self.settings.window_size))
         if self.settings.window_position is not None:
-            # 擺到指定螢幕（座標是 Windows 桌面的虛擬座標，可為負值）
-            x, y = self.settings.window_position
-            args.append(f"--window-position={x},{y}")
+            args.append("--window-position={},{}".format(*self.settings.window_position))
         if self.settings.start_fullscreen:
             args.append("--start-fullscreen")
         launch_kwargs: dict[str, Any] = {
@@ -345,6 +368,11 @@ class LaunchNavigator(PlaywrightNavigator):
             # viewport=None 讓頁面跟著實際視窗大小，全螢幕才不會留白邊
             "viewport": None,
             "args": args,
+            # 這兩個是為了讓錄到的畫面乾淨：
+            #   chromium_sandbox=True  → 不傳 --no-sandbox，就不會出現安全性警告橫幅
+            #   忽略 --enable-automation → 不會出現「正受到自動測試軟體控制」橫幅
+            "chromium_sandbox": True,
+            "ignore_default_args": ["--enable-automation"],
         }
         if self.settings.channel and self.settings.channel != "chromium":
             launch_kwargs["channel"] = self.settings.channel

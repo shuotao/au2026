@@ -106,7 +106,7 @@ def _browser_settings(cfg: Config) -> BrowserSettings:
             user_data_dir=cfg.resolve("browser", "user_data_dir"),
             channel=str(cfg.get("browser", "channel")),
             headless=bool(cfg.get("browser", "headless")),
-            window_size=(int(size[0]), int(size[1])),
+            window_size=(int(size[0]), int(size[1])) if len(size) == 2 else None,
             settle_seconds=int(cfg.get("browser", "settle_seconds")),
             play_selectors=list(cfg.get("browser", "play_selectors")),
             fullscreen=bool(cfg.get("browser", "fullscreen")),

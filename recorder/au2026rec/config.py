@@ -39,11 +39,11 @@ DEFAULTS: dict[str, dict[str, Any]] = {
         "login_url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital",
         "wait_for_login": True,
         "window_position": [],
-        "start_fullscreen": True,
+        "start_fullscreen": False,
         "user_data_dir": "browser-profile",
         "channel": "chrome",
         "headless": False,
-        "window_size": [1920, 1080],
+        "window_size": [],
         "settle_seconds": 8,
         "play_selectors": [
             "button:has-text('Watch now')",
@@ -54,7 +54,7 @@ DEFAULTS: dict[str, dict[str, Any]] = {
             ".vjs-big-play-button",
             "video",
         ],
-        "fullscreen": True,
+        "fullscreen": False,
         "fullscreen_selectors": [
             "[aria-label*='Fullscreen' i]",
             ".vjs-fullscreen-control",
@@ -142,12 +142,14 @@ def _validate(cfg: Config) -> None:
         if not isinstance(value, int) or value < 0:
             raise ConfigError(f"[{section}] {key} 必須是 0 或正整數，讀到 {value!r}")
     size = cfg.get("browser", "window_size")
-    if not (isinstance(size, list) and len(size) == 2 and all(isinstance(n, int) for n in size)):
-        raise ConfigError("[browser] window_size 必須是兩個整數，例如 [1920, 1080]")
+    if not (isinstance(size, list) and len(size) in (0, 2) and all(isinstance(n, int) for n in size)):
+        raise ConfigError(
+            "[browser] window_size 要嘛留空 []（不動視窗大小），要嘛是兩個整數，例如 [1920, 1080]"
+        )
     position = cfg.get("browser", "window_position")
     if not (isinstance(position, list) and (len(position) == 0 or len(position) == 2)):
         raise ConfigError(
-            "[browser] window_position 要嘛留空 []（讓瀏覽器記住你上次拖到的螢幕），"
+            "[browser] window_position 要嘛留空 []（不動視窗位置），"
             "要嘛是兩個整數座標，例如 [1920, 0]"
         )
     mode = str(cfg.get("browser", "mode")).lower()

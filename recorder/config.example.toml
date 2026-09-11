@@ -66,14 +66,16 @@ wait_for_login = true
 
 # launch 模式的瀏覽器 profile 目錄，登入狀態存在這裡
 user_data_dir = "browser-profile"
-channel = "chrome"      # chrome / msedge / chromium / brave 需自行指定 executable
+channel = "chrome"      # chrome / msedge / chromium
 headless = false        # 要錄影一定要 false，OBS 得拍得到畫面
-window_size = [1920, 1080]
-# 視窗要擺在哪個螢幕的座標。留空 [] = 不指定，瀏覽器會記住你上次手動拖到的位置
-# （第一次跑時把視窗拖到 OBS 要錄的那個螢幕，之後它就會開在那裡）
-window_position = []
-# 啟動時直接全螢幕
-start_fullscreen = true
+
+# ── 視窗擺放 ───────────────────────────────────────────────────────────
+# 預設程式完全不碰視窗的大小與位置：你把瀏覽器擺在哪個螢幕、拉多大、要不要
+# 全螢幕，錄到的就是那樣。OBS 只負責錄你指定的那個螢幕。
+# 下面三個都留預設就好，除非你真的想讓程式代管視窗。
+window_size = []        # [] = 不動；或 [1920, 1080]
+window_position = []    # [] = 不動；或 [1920, 0]
+start_fullscreen = false  # true = 開頁後用 CDP 把視窗切全螢幕
 
 # 開頁後等網頁靜止幾秒再找播放鍵
 settle_seconds = 8
@@ -89,8 +91,9 @@ play_selectors = [
   ".vjs-big-play-button",
   "video",
 ]
-# 播放後嘗試全螢幕
-fullscreen = true
+# 播放後是否再點播放器自己的全螢幕鍵。
+# 預設 false：AU 的頁面旁邊有字幕與課程資訊，錄整頁比只錄影片有用。
+fullscreen = false
 fullscreen_selectors = [
   "[aria-label*='Fullscreen' i]",
   ".vjs-fullscreen-control",
