@@ -1,6 +1,7 @@
 """設定檔載入：TOML + 內建預設值，路徑一律相對於設定檔所在目錄。"""
 from __future__ import annotations
 
+import sys
 import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -115,12 +116,36 @@ def _merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
+def app_dir() -> Path:
+    """程式所在的資料夾。打包成 exe 時是 exe 旁邊，否則是套件的上層目錄。"""
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent.parent
+
+
+def config_candidates(path: str | Path | None) -> list[Path]:
+    """設定檔的尋找順序：指定路徑 → 目前工作目錄 → 程式所在資料夾。"""
+    if path:
+        return [Path(path)]
+    seen: list[Path] = []
+    for candidate in (Path.cwd() / "config.toml", app_dir() / "config.toml"):
+        resolved = candidate.resolve()
+        if resolved not in [p.resolve() for p in seen]:
+            seen.append(candidate)
+    return seen
+
+
 def load_config(path: str | Path | None) -> Config:
-    """讀取設定檔。path 為 None 時找工作目錄的 config.toml。"""
-    candidate = Path(path) if path else Path("config.toml")
-    if not candidate.exists():
+    """讀取設定檔。沒指定路徑時，先找工作目錄，再找程式所在資料夾。"""
+    candidates = config_candidates(path)
+    candidate = next((c for c in candidates if c.exists()), None)
+    if candidate is None:
+        looked = "\n".join(f"    {c.resolve()}" for c in candidates)
         raise ConfigError(
-            f"找不到設定檔 {candidate}。先執行 `au2026rec init` 產生一份，再改裡面的設定。"
+            "找不到設定檔 config.toml。找過這些地方：\n"
+            f"{looked}\n"
+            "  執行 `au2026rec init`（或在選單選 9）在目前資料夾產生一份，\n"
+            "  記得把你的課表 CSV 也放到同一個資料夾。"
         )
     with candidate.open("rb") as fh:
         user_data = tomllib.load(fh)
