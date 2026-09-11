@@ -1,6 +1,7 @@
 """au2026rec 命令列介面。
 
-    au2026rec init                 產生 config.toml
+    au2026rec setup                第一次使用：引導式設定（推薦）
+    au2026rec init                 只產生 config.toml
     au2026rec catalog              從挑課工具 HTML 建立 code → 網址 對照表
     au2026rec validate             檢查課表能不能讀、網址有沒有齊
     au2026rec plan                 印出實際錄影時間軸
@@ -188,6 +189,8 @@ def cmd_init(args: argparse.Namespace) -> int:
         return 1
     target.write_text(EXAMPLE_CONFIG.read_text(encoding="utf-8"), encoding="utf-8")
     print(f"已產生 {target}")
+    if getattr(args, "quiet", False):
+        return 0  # 引導設定裡呼叫時，後續步驟由精靈自己帶，不要印手動指示
     print("接下來：")
     print("  1. 改 [schedule] file 指向你從 AU2026 匯出的 CSV")
     print("  2. 填 [obs] password（OBS → 工具 → WebSocket 伺服器設定）")
@@ -368,6 +371,230 @@ def cmd_probe(args: argparse.Namespace) -> int:
     print("\n把命中播放的那一個寫進 config.toml 的 [browser] play_selectors，例如：")
     print("  \"button:has-text('Watch now')\"  或  \"#playButton\"")
     return 0
+
+
+# ── 引導設定精靈 ────────────────────────────────────────────────────────
+
+def _ask(prompt: str, default: str = "") -> str:
+    suffix = f"（直接按 Enter = {default}）" if default else ""
+    try:
+        answer = input(f"{prompt}{suffix}：").strip()
+    except (EOFError, KeyboardInterrupt):
+        raise KeyboardInterrupt from None
+    return answer or default
+
+
+def _confirm(prompt: str, default: bool = True) -> bool:
+    hint = "Y/n" if default else "y/N"
+    answer = _ask(f"{prompt} [{hint}]").lower()
+    if not answer:
+        return default
+    return answer.startswith("y")
+
+
+def pick_file_dialog(title: str) -> str | None:
+    """開系統的檔案選取視窗。沒有 tkinter（或跑在沒桌面的環境）就回 None。"""
+    try:
+        import tkinter
+        from tkinter import filedialog
+    except ImportError:
+        return None
+    try:
+        root = tkinter.Tk()
+        root.withdraw()
+        root.attributes("-topmost", True)
+        chosen = filedialog.askopenfilename(
+            title=title,
+            filetypes=[("課表檔", "*.csv *.ics"), ("所有檔案", "*.*")],
+            initialdir=str(Path.home() / "Downloads"),
+        )
+        root.destroy()
+    except Exception:
+        return None
+    return chosen or None
+
+
+def _toml_path(value: Path) -> str:
+    """TOML 字面字串：單引號內不處理跳脫，Windows 路徑的反斜線才不會出事。"""
+    return "'" + str(value).replace("'", "") + "'"
+
+
+def _step(number: int, total: int, title: str) -> None:
+    print(f"\n{'─' * 62}\n【步驟 {number}/{total}】{title}\n")
+
+
+def cmd_setup(args: argparse.Namespace) -> int:
+    """第一次使用的引導設定：一路問到底，問完就能開始錄。"""
+    setup_console()
+    total = 6
+    config_path = Path(args.config or "config.toml")
+
+    print("\n" + "=" * 62)
+    print("  au2026rec 引導設定")
+    print("=" * 62)
+    print(f"\n⚠ {DISCLAIMER}\n")
+    print("這個精靈會幫你把 OBS、螢幕、課表、登入全部設定好。")
+    print("任何一步都可以按 Ctrl-C 中斷，已經設定好的不會不見。")
+
+    try:
+        # ── 1. 設定檔 ───────────────────────────────────────────────────
+        _step(1, total, "設定檔")
+        if config_path.exists():
+            print(f"已經有設定檔：{config_path.resolve()}")
+        else:
+            args.force = False
+            args.quiet = True
+            if cmd_init(args) != 0:
+                return 1
+            print("（OBS 密碼、場景、課表等等，接下來幾步會幫你填好）")
+
+        # ── 2. OBS 連線 ────────────────────────────────────────────────
+        _step(2, total, "OBS 連線")
+        while True:
+            info = obslocal.inspect(None)
+            websocket = info.websocket
+            if websocket is None:
+                print("找不到 OBS 的設定檔 —— OBS 至少要開啟過一次。")
+                if not _confirm("已經開過 OBS 了，再檢查一次？"):
+                    return 1
+                continue
+            if websocket.enabled:
+                print(f"OBS WebSocket 已啟用（埠號 {websocket.port}）")
+                break
+            print("OBS 的 WebSocket 伺服器還沒啟用，程式可以幫你開。")
+            if obslocal.obs_is_running():
+                print("但 OBS 現在是開著的 —— 這時候改設定會在 OBS 關閉時被蓋掉。")
+                _ask("請先完全關閉 OBS，然後按 Enter 繼續")
+                continue
+            backup, websocket = obslocal.enable_websocket(websocket)
+            print(f"✓ 已啟用（原設定備份在 {backup.name}）")
+            break
+
+        changes = obslocal.apply_to_config(
+            config_path, port=websocket.port, password=websocket.password
+        )
+        print(f"✓ 密碼與埠號已寫入設定檔{('：' + '、'.join(changes)) if changes else '（原本就是對的）'}")
+
+        print("\n接下來要用 OBS 建立錄課場景，請現在開啟 OBS。")
+        _ask("OBS 開好了就按 Enter")
+
+        cfg = load_config(config_path)
+        obs = _make_obs(cfg)
+        try:
+            print(f"✓ 連上 {obs.connect()}")
+        except ObsError as exc:
+            print(f"✗ {exc}")
+            return 1
+
+        try:
+            client = obs._require()  # noqa: SLF001
+
+            # ── 3. 選螢幕、建場景 ──────────────────────────────────────
+            _step(3, total, "要錄哪一個螢幕")
+            monitors = obsscene.list_monitors(client)
+            if not monitors:
+                print("讀不到螢幕清單，請在 OBS 裡自己建場景後回來。")
+            else:
+                for monitor in monitors:
+                    print(f"  {monitor}")
+                print("\n把瀏覽器擺在哪個螢幕，就選哪個。")
+                while True:
+                    raw = _ask("螢幕編號", str(monitors[0].index))
+                    chosen = next((m for m in monitors if str(m.index) == raw), None)
+                    if chosen:
+                        break
+                    print("沒有這個編號，再選一次")
+                scene = "AU2026 錄課"
+                for note in obsscene.ensure_recording_scene(
+                    client, scene=scene, monitor=chosen, desktop_audio=True, switch_to=True
+                ):
+                    print(f"  · {note}")
+                set_value(config_path, "obs", "scene", f'"{scene}"')
+                print(f"✓ 場景「{scene}」已就緒，錄影前會自動切過去")
+
+            # ── 4. 試錄 ────────────────────────────────────────────────
+            _step(4, total, "試錄一段，確認畫面與聲音")
+            print("接下來錄 8 秒。**現在先在那個螢幕上放點會動、有聲音的東西**（例如播一段影片），")
+            print("這樣才驗得出畫面跟收音都正常。")
+            if _confirm("開始試錄？"):
+                name = f"au2026rec_setup_{datetime.now():%H%M%S}"
+                obs.start_recording(name)
+                for remaining in range(8, 0, -1):
+                    print(f"  錄影中… {remaining}", end="\r", flush=True)
+                    time.sleep(1)
+                path = obs.stop_recording()
+                obs.restore_filename_format()
+                print(f"\n✓ 輸出：{path or '（OBS 未回報路徑，去 OBS 的錄影資料夾看）'}")
+                if path and Path(path).exists():
+                    size = Path(path).stat().st_size / 1024 / 1024
+                    print(f"  大小 {size:.1f} MB")
+                    if size < 0.05:
+                        print("  ✗ 檔案幾乎是空的 —— 場景可能沒有畫面來源，回 OBS 檢查")
+                print("\n請打開那個檔案看一下：畫面對不對？有沒有聲音？")
+                if not _confirm("沒問題，繼續？"):
+                    print("請在 OBS 裡調整場景後，再跑一次引導設定。")
+                    return 1
+        finally:
+            obs.close()
+
+        # ── 5. 課表 ────────────────────────────────────────────────────
+        _step(5, total, "你的課表")
+        print("課表要從 AU2026 網站匯出（登入後進 My Schedule，找 Export / Download），")
+        print("下載到的 CSV 或 ICS 都可以。")
+        current = cfg.resolve("schedule", "file")
+        if current.exists():
+            print(f"\n目前設定的課表：{current}")
+        if not current.exists() or _confirm("要改用別的課表檔嗎？", default=not current.exists()):
+            chosen_file = pick_file_dialog("選擇你從 AU2026 匯出的課表")
+            if chosen_file is None:
+                chosen_file = _ask("找不到檔案選取視窗，請直接貼上課表檔的完整路徑")
+            schedule_path = Path(chosen_file.strip('"')) if chosen_file else None
+            if schedule_path and schedule_path.exists():
+                set_value(config_path, "schedule", "file", _toml_path(schedule_path))
+                print(f"✓ 課表設定為 {schedule_path}")
+            else:
+                print("! 沒有選到檔案，維持原設定")
+
+        cfg = load_config(config_path)
+        catalog_path = cfg.resolve("schedule", "catalog")
+        if not catalog_path.exists():
+            print("\n建立課程網址對照表…")
+            packaged = bundled("catalog.json")
+            sources = resolve_sources([], cfg.root) + ([packaged] if packaged.exists() else [])
+            catalog, _ = build_catalog(sources)
+            write_catalog(catalog, catalog_path)
+            print(f"✓ 對照表已建立（{len(catalog)} 筆）")
+
+        sessions, warnings = _load_sessions(cfg)
+        if warnings:
+            print("\n提醒：")
+            _print_warnings(warnings[:5])
+        if sessions:
+            print()
+            print(_plan_table(cfg, _build_plan(cfg, sessions)))
+        else:
+            print("! 課表裡沒有讀到可用的場次，請確認匯出的檔案內容")
+
+        # ── 6. 登入 ────────────────────────────────────────────────────
+        _step(6, total, "登入 AU2026")
+        if _confirm("現在開瀏覽器登入？（登入狀態會記住，之後不用再登）"):
+            navigator = _make_navigator(cfg)
+            try:
+                _login_prompt(cfg, navigator, closing=True)
+            finally:
+                navigator.close()
+
+        print("\n" + "=" * 62)
+        print("  設定完成")
+        print("=" * 62)
+        print("\n正式開始錄影：回主選單選 6（或執行 au2026rec run）")
+        print("⚠ 第一場請盯著前 5 分鐘 —— 真實課程頁的播放鍵還沒驗證過，")
+        print("  詳細判斷方式看「使用說明.md」第六節。")
+        return 0
+
+    except KeyboardInterrupt:
+        print("\n\n已中斷。已經設定好的部分都留著，隨時可以再跑一次引導設定。")
+        return 130
 
 
 def cmd_display(args: argparse.Namespace) -> int:
@@ -730,6 +957,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_probe.add_argument("--limit", type=int, default=40)
     p_probe.set_defaults(func=cmd_probe)
 
+    p_setup = sub.add_parser("setup", help="第一次使用：引導式設定（推薦）")
+    p_setup.add_argument("--force", action="store_true", help=argparse.SUPPRESS)
+    p_setup.set_defaults(func=cmd_setup)
+
     p_display = sub.add_parser("display", help="列出螢幕並建立專屬的錄課場景")
     p_display.add_argument("--use", type=int, help="用第幾個螢幕（編號取自本指令列出的清單）")
     p_display.add_argument("--scene", help="場景名稱（預設 AU2026 錄課）")
@@ -767,15 +998,16 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 MENU = [
-    ("1", "檢查 OBS 設定（密碼、錄影資料夾、場景）", ["obs-doctor"]),
-    ("2", "列出螢幕、建立錄課場景", ["display"]),
-    ("3", "試錄 8 秒，確認畫面與聲音都正常", ["obs-test", "--record-seconds", "8"]),
-    ("4", "檢查課表、看錄影時間軸", ["plan"]),
-    ("5", "開瀏覽器登入 AU2026（登入一次就好）", ["login"]),
-    ("6", "開始排程錄影", ["run"]),
-    ("7", "找播放鍵選擇器（需要輸入課程代碼）", ["probe"]),
-    ("8", "重新建立課程網址對照表", ["catalog"]),
-    ("9", "產生設定檔 config.toml", ["init"]),
+    ("1", "★ 第一次使用：一步一步幫你設定好", ["setup"]),
+    ("2", "檢查 OBS 設定（密碼、錄影資料夾、場景）", ["obs-doctor"]),
+    ("3", "列出螢幕、建立錄課場景", ["display"]),
+    ("4", "試錄 8 秒，確認畫面與聲音都正常", ["obs-test", "--record-seconds", "8"]),
+    ("5", "檢查課表、看錄影時間軸", ["plan"]),
+    ("6", "開瀏覽器登入 AU2026（登入一次就好）", ["login"]),
+    ("7", "▶ 開始排程錄影", ["run"]),
+    ("8", "找播放鍵選擇器（需要輸入課程代碼）", ["probe"]),
+    ("9", "重新建立課程網址對照表", ["catalog"]),
+    ("i", "只產生設定檔 config.toml", ["init"]),
 ]
 
 
@@ -787,7 +1019,7 @@ def interactive_menu() -> int:
     print(f"工作目錄：{Path.cwd()}")
     config_path = Path("config.toml")
     if not config_path.exists():
-        print("！這個資料夾還沒有 config.toml，先選 9 產生一份再從 1 開始。")
+        print("！這個資料夾還沒有設定檔。直接選 1，精靈會從頭帶你設定好。")
 
     while True:
         print("\n" + "─" * 60)

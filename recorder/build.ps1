@@ -4,11 +4,12 @@
 #   .\build.ps1 -OneFile     → dist\au2026rec.exe（單檔版，好搬但每次啟動要解壓約 100 MB）
 #
 # 打包內容不含瀏覽器：程式用的是你電腦上已安裝的 Chrome（[browser] channel）。
-# 執行檔旁邊要放 config.toml 與 my_schedule.csv；沒有 config.toml 時選單第 9 項可以產生。
+# 執行檔旁邊要放 config.toml 與 my_schedule.csv；沒有的話點兩下 exe 選 1 走引導設定。
 
 param(
     [switch]$OneFile,
-    [switch]$Clean
+    [switch]$Clean,
+    [switch]$Zip      # 另外打包成 zip，給別人直接用、不用編譯
 )
 
 # 注意：不要設 $ErrorActionPreference = 'Stop'。Windows PowerShell 5.1 會把原生
@@ -70,8 +71,18 @@ if (Test-Path $exe) {
         $colour = if ($mark -eq '有') { 'Green' } else { 'Yellow' }
         Write-Host ("  [{0}] {1}" -f $mark, $f) -ForegroundColor $colour
     }
-    Write-Host "  config.toml    → 點兩下 exe 選 9 可以產生"
+    Write-Host "  config.toml    → 點兩下 exe 選 1 走引導設定會幫你產生"
     Write-Host "  my_schedule.csv → 從 AU2026 網站 My Schedule 匯出（見 使用說明.md 第二節）"
+    if ($Zip -and -not $OneFile) {
+        $version = (Select-String -Path 'au2026rec\__init__.py' -Pattern '__version__ = "(.+)"').Matches.Groups[1].Value
+        $zipPath = "dist\au2026rec-$version-win64.zip"
+        Remove-Item $zipPath -ErrorAction SilentlyContinue
+        Compress-Archive -Path $outDir -DestinationPath $zipPath
+        $zipSize = [math]::Round((Get-Item $zipPath).Length / 1MB, 1)
+        Write-Host "`n發佈包：$zipPath（$zipSize MB）" -ForegroundColor Green
+        Write-Host "  收到的人解壓縮後點兩下 au2026rec.exe，選 1 走引導設定即可，不需要安裝 Python。"
+    }
+
     Write-Host "`n點兩下 exe 會出現操作選單；也可以下指令，例如：$exe plan"
 } else {
     Write-Host "`n打包失敗，沒有產生 $exe" -ForegroundColor Red
