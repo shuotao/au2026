@@ -9,3 +9,9 @@ logs/
 __pycache__/
 *.pyc
 *.egg-info/
+
+# PyInstaller 產物
+build/
+dist/
+*.spec
+config.toml.bak-*

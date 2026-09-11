@@ -37,7 +37,29 @@
 程式碼本身以 MIT 授權釋出（見 [LICENSE](LICENSE)）。**授權只涵蓋程式碼，
 不涵蓋你用它錄下的內容** —— 那部分的權利義務見上面的免責聲明。
 
-## 一、裝東西
+## 一、兩種用法：執行檔或 Python
+
+**想點兩下就用** → 打包成執行檔：
+
+```powershell
+cd recorder
+.\build.ps1              # 產生 dist\au2026rec\au2026rec.exe（資料夾約 146 MB）
+.\build.ps1 -OneFile     # 或單一檔案版，好搬但每次啟動要解壓
+```
+
+把 `dist\au2026rec` 整個資料夾複製到你要的地方，**點兩下 `au2026rec.exe`** 就會出現
+操作選單（檢查 OBS、試錄、看時間軸、開始錄影…），不用記指令。也可以照舊下指令：
+`au2026rec.exe plan`。
+
+執行檔會在**目前所在的資料夾**讀寫 `config.toml`、`my_schedule.csv`、`catalog.json`
+與 `logs\`，所以把課表跟 exe 放在同一個資料夾最省事。設定範本與 173 筆課程網址
+對照表已經包在裡面，選單第 9 項可以產生 `config.toml`。
+
+執行檔**不含瀏覽器**：它用的是你電腦上已安裝的 Chrome。
+
+**想用 Python 跑** →
+
+## 二、裝東西
 
 ```powershell
 cd recorder
@@ -46,7 +68,7 @@ pip install -e .
 #   playwright install chromium   （並把 config.toml 的 channel 改成 "chromium"）
 ```
 
-## 二、跑起來（七步）
+## 三、跑起來（七步）
 
 ```powershell
 au2026rec init                            # 1. 產生 config.toml
@@ -63,7 +85,7 @@ au2026rec run                             #    開始待機
 第 2 步要先**關掉 OBS**（OBS 執行中改它的設定檔會在關閉時被覆寫，程式會擋下來）。
 它會讀 OBS 自己的設定檔，把 WebSocket 埠號與密碼填進 `config.toml`，你不用手抄。
 
-## 三、瀏覽器怎麼接（`[browser] mode`）
+## 四、瀏覽器怎麼接（`[browser] mode`）
 
 | 模式 | 怎麼運作 | 適用 |
 |---|---|---|
@@ -81,7 +103,7 @@ brave.exe --remote-debugging-port=9222 --user-data-dir="$env:USERPROFILE\au2026-
 `launch` / `attach` 失敗時，會依 `fallback_to_open` 自動退回 `open`，
 不讓一場課因為自動化壞掉就完全錄不到。
 
-## 四、課表從哪來
+## 五、課表從哪來
 
 AU2026 的 My Schedule 匯出格式，直接吃：
 
@@ -100,7 +122,7 @@ Scheduled,Day 1 Keynote,KEY1001-D,2026-09-15,09:00,10:30,Digital G
 * `Status` 只錄 `Scheduled` / `Registered` / `Confirmed`（見 `status_include`），
   候補的會跳過並提醒。
 
-## 五、時間重疊怎麼處理
+## 六、時間重疊怎麼處理
 
 `[schedule] overlap_policy = "shift"`（預設）：
 
@@ -117,7 +139,7 @@ Scheduled,Day 1 Keynote,KEY1001-D,2026-09-15,09:00,10:30,Digital G
 
 其他選項：`skip`（重疊就跳過）、`keep`（照課表硬幹，會互相打斷）。
 
-## 六、OBS 這端
+## 七、OBS 這端
 
 **錄哪個螢幕由你決定**：`au2026rec display` 列出 OBS 認得的螢幕，
 `au2026rec display --use N` 會**新增**一個場景（預設「AU2026 錄課」），內含：
@@ -137,7 +159,7 @@ Scheduled,Day 1 Keynote,KEY1001-D,2026-09-15,09:00,10:30,Digital G
 檔名由 `[recording] filename_template` 決定，做法是暫時改 OBS 的
 FilenameFormatting，**每次跑完會自動還原**，不會污染你平常手動錄影的命名。
 
-## 七、驗過的東西（2026-09-10 於本機實測）
+## 八、驗過的東西（2026-09-10 於本機實測）
 
 | 項目 | 結果 |
 |---|---|
@@ -155,7 +177,7 @@ FilenameFormatting，**每次跑完會自動還原**，不會污染你平常手�
 導頁、按播放、切場景、分場錄影、檔名、報告都正確，錄出的畫面確認是**會動的影片**
 （159 / 221 個變動幀），音訊 mean −19.2 dB。
 
-## 八、正式跑之前
+## 九、正式跑之前
 
 播放鍵的選擇器是唯一沒辦法事先驗的一環（要有登入後的播放頁才看得到），
 所以留了工具：
@@ -169,7 +191,7 @@ au2026rec test-record KEY1001-D --seconds 30  # 完整流程試錄 30 秒
 （清單由上往下試，點到第一個看得見的就停）。找不到也只是不會自動播，
 畫面照錄 —— 第一場人工盯一下就能把選擇器補齊。
 
-## 九、無人值守注意事項
+## 十、無人值守注意事項
 
 * **不要讓電腦睡著、螢幕不要關**：`powercfg /change standby-timeout-ac 0`、
   `powercfg /change monitor-timeout-ac 0`（螢幕擷取抓的是實際畫面）。
@@ -182,7 +204,7 @@ au2026rec test-record KEY1001-D --seconds 30  # 完整流程試錄 30 秒
 * 紀錄在 `logs/au2026rec.log`；每場結果（含輸出檔路徑）在 `logs/sessions.csv`，
   錄完一場就即時寫入，中途斷電也留得住。
 
-## 十、指令一覽
+## 十一、指令一覽
 
 | 指令 | 用途 |
 |---|---|
@@ -198,7 +220,7 @@ au2026rec test-record KEY1001-D --seconds 30  # 完整流程試錄 30 秒
 | `test-record <code>` | 拿真實課程跑完整流程但只錄幾十秒 |
 | `run` | 照課表無人值守執行（`-y` 跳過確認與登入等待） |
 
-## 十一、開發
+## 十二、開發
 
 ```powershell
 python -m unittest discover -s tests -v
@@ -220,6 +242,7 @@ recorder/
     obslocal.py   讀本機 OBS 設定檔（密碼、輸出路徑、profile）
     obsscene.py   建立錄課場景（螢幕擷取 + 桌面音訊）
     runner.py     等時間 → 導頁 → 開錄 → 停錄 → 下一場
+  build.ps1       打包成 Windows 執行檔
   tests/
   config.example.toml
 ```

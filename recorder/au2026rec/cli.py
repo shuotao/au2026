@@ -45,13 +45,52 @@ from au2026rec.plan import (
 from au2026rec.runner import RunOptions, Runner, now_utc, setup_logging
 from au2026rec.schedule import ScheduleError, get_zone, load_catalog, load_schedule
 
+def setup_console() -> None:
+    """讓主控台能印中文與 ⚠ ✓ ✗ 這類符號。
+
+    Windows 的主控台預設是 cp950（繁中），遇到 U+26A0 這種不在字碼表裡的字元
+    會直接拋 UnicodeEncodeError 把程式打掛 —— 打包成 exe 後特別明顯，因為沒有
+    PYTHONIOENCODING 可以靠。所以這裡把主控台與 stdout/stderr 都切成 UTF-8，
+    並用 errors="replace" 保底：就算字型缺字也只是顯示成問號，不會中斷。
+    """
+    if sys.platform == "win32":
+        try:
+            import ctypes
+
+            ctypes.windll.kernel32.SetConsoleOutputCP(65001)
+            ctypes.windll.kernel32.SetConsoleCP(65001)
+        except Exception:
+            pass  # 沒有主控台（例如被重導向）時失敗無所謂
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError, OSError):
+            pass
+
+
 DISCLAIMER = (
     "本工具錄影僅供個人學習與課後複習；請遵守 AU 使用條款與著作權法。"
     "違法或侵權使用與開發者無關，詳見 README 的免責聲明。"
 )
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
-EXAMPLE_CONFIG = PACKAGE_ROOT.parent / "config.example.toml"
+
+
+def bundled(name: str) -> Path:
+    """找隨程式附帶的檔案。打包成 exe 時在 PyInstaller 的暫存目錄，否則在原始碼旁。"""
+    base = getattr(sys, "_MEIPASS", None)
+    if base:
+        candidate = Path(base) / name
+        if candidate.exists():
+            return candidate
+    return PACKAGE_ROOT.parent / name
+
+
+def is_frozen() -> bool:
+    return bool(getattr(sys, "frozen", False))
+
+
+EXAMPLE_CONFIG = bundled("config.example.toml")
 
 
 # ── 共用 ────────────────────────────────────────────────────────────────
@@ -163,6 +202,9 @@ def cmd_init(args: argparse.Namespace) -> int:
 def cmd_catalog(args: argparse.Namespace) -> int:
     cfg = _load(args)
     sources = resolve_sources(args.source or [], cfg.root)
+    packaged = bundled("catalog.json")
+    if packaged.exists() and packaged != cfg.resolve("schedule", "catalog"):
+        sources.append(packaged)  # 打包版附帶的對照表當最後備援
     catalog, notes = build_catalog(sources)
     target = cfg.resolve("schedule", "catalog")
     write_catalog(catalog, target)
@@ -286,7 +328,7 @@ def cmd_probe(args: argparse.Namespace) -> int:
     cfg = _load(args)
     setup_logging(None, args.verbose)
     url = args.url
-    if not url.startswith("http"):
+    if "://" not in url:  # 不像網址就當成課程代碼，去對照表查
         catalog = load_catalog(cfg.resolve("schedule", "catalog"))
         entry = catalog.get(url.upper())
         if not entry or not entry.get("url"):
@@ -724,7 +766,75 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+MENU = [
+    ("1", "檢查 OBS 設定（密碼、錄影資料夾、場景）", ["obs-doctor"]),
+    ("2", "列出螢幕、建立錄課場景", ["display"]),
+    ("3", "試錄 8 秒，確認畫面與聲音都正常", ["obs-test", "--record-seconds", "8"]),
+    ("4", "檢查課表、看錄影時間軸", ["plan"]),
+    ("5", "開瀏覽器登入 AU2026（登入一次就好）", ["login"]),
+    ("6", "開始排程錄影", ["run"]),
+    ("7", "找播放鍵選擇器（需要輸入課程代碼）", ["probe"]),
+    ("8", "重新建立課程網址對照表", ["catalog"]),
+    ("9", "產生設定檔 config.toml", ["init"]),
+]
+
+
+def interactive_menu() -> int:
+    """沒帶參數執行時（例如在檔案總管點兩下 exe）給的選單。"""
+    parser = build_parser()
+    print(f"\nau2026rec {__version__} — AU2026 自動開課 + OBS 錄影")
+    print(f"⚠ {DISCLAIMER}\n")
+    print(f"工作目錄：{Path.cwd()}")
+    config_path = Path("config.toml")
+    if not config_path.exists():
+        print("！這個資料夾還沒有 config.toml，先選 9 產生一份再從 1 開始。")
+
+    while True:
+        print("\n" + "─" * 60)
+        for key, label, _ in MENU:
+            print(f"  {key})  {label}")
+        print("  0)  離開")
+        try:
+            choice = input("\n請輸入編號：").strip()
+        except (EOFError, KeyboardInterrupt):
+            return 0
+        if choice in {"0", "q", "Q", ""}:
+            return 0
+        entry = next((m for m in MENU if m[0] == choice), None)
+        if entry is None:
+            print("沒有這個選項")
+            continue
+
+        argv = list(entry[2])
+        if argv[0] == "probe":
+            try:
+                code = input("課程代碼或網址（例如 KEY1001-D）：").strip()
+            except (EOFError, KeyboardInterrupt):
+                continue
+            if not code:
+                continue
+            argv.append(code)
+
+        print()
+        try:
+            args = parser.parse_args(argv)
+            code = int(args.func(args))
+        except SystemExit as exc:  # argparse 的錯誤不該讓選單整個結束
+            code = int(exc.code or 0)
+        except (ConfigError, ScheduleError, CatalogError, obslocal.ObsLocalError, ObsError) as exc:
+            print(f"✗ {exc}")
+            code = 1
+        except KeyboardInterrupt:
+            print("\n已中斷")
+            code = 130
+        print(f"\n（結束，代碼 {code}）")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
+    setup_console()
+    if argv is None and len(sys.argv) == 1 and sys.stdin is not None and sys.stdin.isatty():
+        # 點兩下 exe 或直接執行不帶參數 → 給選單，不要丟一堆 usage 出來
+        return interactive_menu()
     parser = build_parser()
     args = parser.parse_args(argv)
     try:
