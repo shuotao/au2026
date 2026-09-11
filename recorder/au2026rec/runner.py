@@ -141,11 +141,6 @@ class Runner:
         session = item.session
         row: dict[str, object] = {}
 
-        if not session.url:
-            log.error("%s 沒有課程網址，跳過。先跑 au2026rec catalog 補對照表", session.label())
-            self._record_row(item, result="no-url", note="缺少課程網址")
-            return
-
         sleep_until(
             item.open_at,
             self._stop,
@@ -153,23 +148,32 @@ class Runner:
             countdown_every=self.options.countdown_every,
         )
 
-        try:
-            opened = self.browser.open_session(session.url)
-        except BrowserError as exc:
-            log.error("開課程頁失敗：%s", exc)
-            self._record_row(item, result="browser-error", note=str(exc))
-            return
-        except Exception as exc:  # 網頁千奇百怪，不要因為一場毀掉整晚
-            log.exception("開課程頁時發生未預期錯誤：%s", exc)
-            self._record_row(item, result="browser-error", note=str(exc))
-            return
+        if not session.url:
+            # 沒網址不代表這場要放棄：畫面照錄，使用者自己把頁面開起來就救得回來。
+            log.error(
+                "%s 查不到課程網址，不會自動導頁 —— 請自己在瀏覽器開好那一頁。"
+                "補網址：au2026rec url %s <網址>",
+                session.label(),
+                session.code or "CODE",
+            )
+            row["played"] = False
+            opened = {"played": False, "note": "缺少課程網址，未導頁"}
+        else:
+            try:
+                opened = self.browser.open_session(session.url)
+            except BrowserError as exc:
+                # 導頁失敗也照錄：你手動把頁面開起來，這場還是救得回來。
+                log.error("開課程頁失敗，仍會照時間錄影：%s", exc)
+                opened = {"played": False, "note": f"導頁失敗：{exc}"}
+            except Exception as exc:  # 網頁千奇百怪，不要因為一場毀掉整晚
+                log.exception("開課程頁時發生未預期錯誤，仍會照時間錄影：%s", exc)
+                opened = {"played": False, "note": f"導頁錯誤：{exc}"}
 
         row["played"] = opened.get("played")
-        row["fullscreen"] = opened.get("fullscreen")
         if not opened.get("played"):
             log.warning(
-                "找不到播放鍵，仍會照時間錄影（畫面可能停在課程頁）。"
-                "可用 au2026rec probe 補 [browser] play_selectors"
+                "沒有自動播放，仍會照時間錄影（畫面可能停在課程頁）。"
+                "現在手動按播放還來得及；事後可用 au2026rec probe 補 play_selectors"
             )
 
         sleep_until(item.start, self._stop, label="等課程開始", countdown_every=0)

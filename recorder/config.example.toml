@@ -50,33 +50,22 @@ continue_without_obs = false
 
 [browser]
 # 導頁方式：
-#   launch = 程式自己開一個它控制得到的瀏覽器（推薦）。第一次跑時你在那個視窗
-#            登入 AU2026，登入狀態存在 user_data_dir，之後每場課都導同一個視窗。
-#   attach = 接管一個用一般方式開、已經登入的瀏覽器。登入不會被自動化偵測擋下，
-#            用 `au2026rec browser --set-mode` 可以一鍵開好並切換到這個模式。
+#   attach = 接管一個用一般方式開、已經登入的瀏覽器（預設）。
+#            登入不會被自動化偵測擋下。用選單的「開瀏覽器登入 AU2026」
+#            或指令 `au2026rec browser --set-mode` 一鍵開好。
+#            代價：那個瀏覽器視窗要一直開著，程式靠它導頁。
 #   open   = 只呼叫系統「開這個網址」，零自動化（每場開新分頁）。
-mode = "launch"
-# attach 模式要接的除錯埠
+mode = "attach"
+# attach 要接的除錯埠
 cdp_url = "http://localhost:9222"
-# 瀏覽器自動化失敗時，是否退回 open 模式（至少網頁會開、畫面錄得到）
+# 接不上瀏覽器時，是否退回 open 模式（至少網頁會開、畫面錄得到）
 fallback_to_open = true
-# 開場先開這個頁面讓你確認已登入
+# 開瀏覽器登入時先開這一頁
 login_url = "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital"
-# run 開始前先停下來等你登入/擺好視窗（加 -y 會跳過）
-wait_for_login = true
+# 登入用瀏覽器的 profile 目錄，登入狀態存在這裡
+attach_profile_dir = "attach-profile"
 
-# launch 模式的瀏覽器 profile 目錄，登入狀態存在這裡
-user_data_dir = "browser-profile"
-channel = "chrome"      # chrome / msedge / chromium
-headless = false        # 要錄影一定要 false，OBS 得拍得到畫面
-
-# ── 視窗擺放 ───────────────────────────────────────────────────────────
-# 預設程式完全不碰視窗的大小與位置：你把瀏覽器擺在哪個螢幕、拉多大、要不要
-# 全螢幕，錄到的就是那樣。OBS 只負責錄你指定的那個螢幕。
-# 下面三個都留預設就好，除非你真的想讓程式代管視窗。
-window_size = []        # [] = 不動；或 [1920, 1080]
-window_position = []    # [] = 不動；或 [1920, 0]
-start_fullscreen = false  # true = 開頁後用 CDP 把視窗切全螢幕
+# 程式不碰視窗的大小與位置：你把瀏覽器擺成什麼樣，OBS 錄到的就是什麼樣。
 
 # 開頁後等網頁靜止幾秒再找播放鍵
 settle_seconds = 8
@@ -91,13 +80,6 @@ play_selectors = [
   "[aria-label*='Play' i]",
   ".vjs-big-play-button",
   "video",
-]
-# 播放後是否再點播放器自己的全螢幕鍵。
-# 預設 false：AU 的頁面旁邊有字幕與課程資訊，錄整頁比只錄影片有用。
-fullscreen = false
-fullscreen_selectors = [
-  "[aria-label*='Fullscreen' i]",
-  ".vjs-fullscreen-control",
 ]
 # 嘗試關掉的彈窗（cookie 同意、歡迎視窗等）
 dismiss_selectors = [

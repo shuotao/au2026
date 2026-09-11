@@ -5,8 +5,8 @@
     au2026rec catalog              從挑課工具 HTML 建立 code → 網址 對照表
     au2026rec validate             檢查課表能不能讀、網址有沒有齊
     au2026rec plan                 印出實際錄影時間軸
-    au2026rec login                程式自己開瀏覽器登入（launch 模式）
-    au2026rec browser --set-mode   用一般方式開瀏覽器登入，之後由程式接管（attach 模式）
+    au2026rec url <code> <url>     當場補上某一堂課的網址
+    au2026rec browser --set-mode   開瀏覽器登入 AU2026，之後由程式接管（推薦）
     au2026rec probe <url>          印出頁面上的可點元素，用來補 play_selectors
     au2026rec display              列出螢幕、建立錄課場景（螢幕擷取 + 桌面音訊）
     au2026rec obs-doctor           檢查本機 OBS 設定，可自動填入密碼
@@ -28,8 +28,8 @@ from au2026rec import browserlaunch, obsscene
 from au2026rec.browser import (
     BrowserError,
     BrowserSettings,
+    AttachNavigator,
     Navigator,
-    PlaywrightNavigator,
     make_navigator,
 )
 from au2026rec.catalog import CatalogError, build_catalog, resolve_sources, write_catalog
@@ -45,7 +45,13 @@ from au2026rec.plan import (
     summarize,
 )
 from au2026rec.runner import RunOptions, Runner, now_utc, setup_logging
-from au2026rec.schedule import ScheduleError, get_zone, load_catalog, load_schedule
+from au2026rec.schedule import (
+    ScheduleError,
+    get_zone,
+    load_catalog,
+    load_schedule,
+    normalize_code,
+)
 
 def setup_console() -> None:
     """讓主控台能印中文與 ⚠ ✓ ✗ 這類符號。
@@ -135,26 +141,14 @@ def _build_plan(cfg: Config, sessions: Sequence[Any]) -> list[PlanItem]:
 
 
 def _browser_settings(cfg: Config) -> BrowserSettings:
-    size = cfg.get("browser", "window_size")
-    position = cfg.get("browser", "window_position")
-    return (
-        BrowserSettings(
-            mode=str(cfg.get("browser", "mode")).lower(),
-            cdp_url=str(cfg.get("browser", "cdp_url")),
-            fallback_to_open=bool(cfg.get("browser", "fallback_to_open")),
-            window_position=(int(position[0]), int(position[1])) if len(position) == 2 else None,
-            start_fullscreen=bool(cfg.get("browser", "start_fullscreen")),
-            user_data_dir=cfg.resolve("browser", "user_data_dir"),
-            channel=str(cfg.get("browser", "channel")),
-            headless=bool(cfg.get("browser", "headless")),
-            window_size=(int(size[0]), int(size[1])) if len(size) == 2 else None,
-            settle_seconds=int(cfg.get("browser", "settle_seconds")),
-            play_selectors=list(cfg.get("browser", "play_selectors")),
-            fullscreen=bool(cfg.get("browser", "fullscreen")),
-            fullscreen_selectors=list(cfg.get("browser", "fullscreen_selectors")),
-            dismiss_selectors=list(cfg.get("browser", "dismiss_selectors")),
-            close_page_after=bool(cfg.get("browser", "close_page_after")),
-        )
+    return BrowserSettings(
+        mode=str(cfg.get("browser", "mode")).lower(),
+        cdp_url=str(cfg.get("browser", "cdp_url")),
+        fallback_to_open=bool(cfg.get("browser", "fallback_to_open")),
+        settle_seconds=int(cfg.get("browser", "settle_seconds")),
+        play_selectors=list(cfg.get("browser", "play_selectors")),
+        dismiss_selectors=list(cfg.get("browser", "dismiss_selectors")),
+        close_page_after=bool(cfg.get("browser", "close_page_after")),
     )
 
 
@@ -196,7 +190,7 @@ def cmd_init(args: argparse.Namespace) -> int:
     print("  1. 改 [schedule] file 指向你從 AU2026 匯出的 CSV")
     print("  2. 填 [obs] password（OBS → 工具 → WebSocket 伺服器設定）")
     print("  3. au2026rec catalog   建立課程網址對照表")
-    print("  4. au2026rec login     手動登入 Autodesk 一次")
+    print("  4. au2026rec browser --set-mode  開瀏覽器登入 Autodesk 一次")
     print("  5. au2026rec plan      確認時間軸")
     print()
     print(f"⚠ {DISCLAIMER}")
@@ -215,6 +209,50 @@ def cmd_catalog(args: argparse.Namespace) -> int:
     print(f"對照表已寫入 {target}（{len(catalog)} 筆）")
     for note in notes:
         print(f"  · {note}")
+    return 0
+
+
+def cmd_url(args: argparse.Namespace) -> int:
+    """當場補上或修改某一堂課的網址（寫進 catalog.json）。
+
+    活動當天發現某場查不到網址時，最快的補法就是這個 —— 從瀏覽器複製網址，
+    一行指令補進去，下一場就生效，不用改課表也不用重跑引導設定。
+    """
+    cfg = _load(args)
+    catalog_path = cfg.resolve("schedule", "catalog")
+    catalog = load_catalog(catalog_path)
+
+    if args.code is None:
+        sessions, _ = _load_sessions(cfg)
+        missing = [s for s in sessions if not s.url]
+        print(f"課表共 {len(sessions)} 場，其中 {len(missing)} 場查不到網址")
+        for session in missing:
+            print(f"  ✗ {session.code or '(無代碼)'}  {session.title}")
+        if missing:
+            print("\n補法：從瀏覽器複製那堂課的網址，然後執行")
+            print(f"  au2026rec url {missing[0].code or 'CODE'} https://conferences.autodesk.com/...")
+        return 1 if missing else 0
+
+    code = normalize_code(args.code)
+    if not args.url:
+        entry = catalog.get(code)
+        print(f"{code}：{entry.get('url') if entry else '（對照表裡沒有這筆）'}")
+        return 0 if entry and entry.get("url") else 1
+
+    if "://" not in args.url:
+        print(f"這看起來不像網址：{args.url}")
+        return 1
+    entry = dict(catalog.get(code) or {})
+    old = entry.get("url")
+    entry.update({"code": code, "url": args.url.strip()})
+    entry.setdefault("title", code)
+    catalog[code] = entry
+    write_catalog(catalog, catalog_path)
+    print(f"✓ {code} 的網址已{'更新' if old else '新增'}：{args.url}")
+    if old:
+        print(f"  （原本是 {old}）")
+    print(f"  寫入 {catalog_path}")
+    print("\n如果排程正在執行中，這一場已經開始的話不受影響；下一場才會用到新網址。")
     return 0
 
 
@@ -288,46 +326,6 @@ def cmd_plan(args: argparse.Namespace) -> int:
     return 0
 
 
-def _login_prompt(cfg: Config, navigator: Navigator, *, closing: bool) -> None:
-    """開 AU2026 頁面，停下來等使用者登入並把視窗擺到要錄的螢幕。"""
-    url = str(cfg.get("browser", "login_url"))
-    if isinstance(navigator, PlaywrightNavigator):
-        try:
-            navigator.show_for_login(url)
-        except Exception as exc:
-            print(f"! 開登入頁失敗（{exc}），請自己在那個視窗打開 AU2026")
-    else:
-        navigator.open_session(url)
-    print()
-    print("瀏覽器已開啟，請在那個視窗裡：")
-    print("  1. 登入 Autodesk，確認你點得進課程播放頁")
-    print("  2. 把視窗拖到 OBS 要錄的那個螢幕，並設成全螢幕")
-    print(f"登入狀態會留在 {cfg.resolve('browser', 'user_data_dir')}，下次不用再登")
-    print()
-    print("完成後回到這裡按 Enter " + ("關閉瀏覽器。" if closing else "開始排程待機。"))
-    try:
-        input()
-    except (EOFError, KeyboardInterrupt):
-        raise KeyboardInterrupt from None
-
-
-def cmd_login(args: argparse.Namespace) -> int:
-    cfg = _load(args)
-    setup_logging(None, args.verbose)
-    if args.url:
-        cfg.data["browser"]["login_url"] = args.url
-    navigator = _make_navigator(cfg)
-    try:
-        _login_prompt(cfg, navigator, closing=True)
-    except BrowserError as exc:
-        print(f"啟動瀏覽器失敗：{exc}")
-        return 1
-    finally:
-        navigator.close()
-    print("已儲存登入狀態。")
-    return 0
-
-
 def cmd_probe(args: argparse.Namespace) -> int:
     cfg = _load(args)
     setup_logging(None, args.verbose)
@@ -340,11 +338,11 @@ def cmd_probe(args: argparse.Namespace) -> int:
             return 1
         url = str(entry["url"])
     navigator = _make_navigator(cfg)
-    if not isinstance(navigator, PlaywrightNavigator):
+    if not isinstance(navigator, AttachNavigator):
         navigator.close()
         print(
-            "probe 需要能控制瀏覽器（[browser] mode 要是 launch 或 attach）；"
-            "目前是 open 模式，沒有辦法檢查頁面元素。"
+            "probe 需要接得上瀏覽器。請先用選單的「開瀏覽器登入 AU2026」"
+            "把瀏覽器開起來，並確認 [browser] mode 是 attach。"
         )
         return 1
     try:
@@ -578,27 +576,14 @@ def cmd_setup(args: argparse.Namespace) -> int:
 
         # ── 6. 登入 ────────────────────────────────────────────────────
         _step(6, total, "登入 AU2026")
-        print("有兩種方式，效果一樣，差別在登入會不會被擋：\n")
-        print("  1) 程式自己開瀏覽器（launch）")
-        print("     最單純。但程式開的瀏覽器帶自動化特徵，少數登入頁會拒絕登入")
-        print("     （尤其用 Google 帳號登入 Autodesk 時）。")
-        print("  2) 你自己開瀏覽器，程式再接管（attach）")
-        print("     程式用一般方式幫你開一個瀏覽器，你像平常一樣登入，之後才接管。")
-        print("     登入不會被擋，代價是那個視窗要一直開著。\n")
-        print("  建議：先試 1；如果登入頁擋你，就回來改用 2。\n")
-        pick = _ask("選擇", "1")
-
-        if pick.strip() == "2":
+        print("程式會用一般方式幫你開一個瀏覽器，你像平常一樣登入就好。")
+        print("（不是由程式代開的自動化瀏覽器 —— 那種會被登入頁擋下來。）")
+        print("登入完那個視窗要一直開著，程式靠它導頁。\n")
+        if _confirm("現在開瀏覽器登入？"):
             args.port = browserlaunch.DEFAULT_PORT
             args.browser = None
             args.set_mode = True
             cmd_browser(args)
-        elif _confirm("現在開瀏覽器登入？（登入狀態會記住，之後不用再登）"):
-            navigator = _make_navigator(cfg)
-            try:
-                _login_prompt(cfg, navigator, closing=True)
-            finally:
-                navigator.close()
 
         print("\n" + "=" * 62)
         print("  設定完成")
@@ -653,7 +638,7 @@ def cmd_browser(args: argparse.Namespace) -> int:
                 print("沒有這個編號")
                 return 1
 
-        profile = cfg.resolve("browser", "user_data_dir").parent / "attach-profile"
+        profile = cfg.resolve("browser", "attach_profile_dir")
         print(f"\n啟動 {chosen.name}（profile：{profile}）…")
         print("注意：如果這個瀏覽器現在是開著的，新視窗會併進舊程序、不會開除錯埠 ——")
         print("      請先把它完全關掉（含背景常駐）。")
@@ -737,7 +722,7 @@ def cmd_display(args: argparse.Namespace) -> int:
         print(f"  · config.toml：{'已把 [obs] scene 設為 ' + scene if changed else '[obs] scene 已經是 ' + scene}")
         print("\n接著：")
         print("  1. au2026rec obs-test --record-seconds 8   確認這個場景錄得出東西、有聲音")
-        print(f"  2. au2026rec login                        把瀏覽器視窗拖到 {chosen.name} 並登入")
+        print(f"  2. 選單的「開瀏覽器登入 AU2026」   把瀏覽器視窗擺到 {chosen.name} 並登入")
         return 0
     except (ObsError, obsscene.SceneError) as exc:
         print(f"✗ {exc}")
@@ -911,15 +896,6 @@ def _run(cfg: Config, items: Sequence[PlanItem], args: argparse.Namespace) -> in
         obs.close()
         return 1
 
-    if bool(cfg.get("browser", "wait_for_login")) and not args.yes:
-        try:
-            _login_prompt(cfg, navigator, closing=False)
-        except KeyboardInterrupt:
-            navigator.close()
-            obs.close()
-            print("\n已取消")
-            return 130
-
     options = RunOptions(
         gap_seconds=int(cfg.get("recording", "gap_seconds")),
         scene=str(cfg.get("obs", "scene")),
@@ -1027,15 +1003,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_catalog.add_argument("--source", action="append", help="來源 HTML/JSON，可重複指定")
     p_catalog.set_defaults(func=cmd_catalog)
 
+    p_url = sub.add_parser("url", help="查／補某一堂課的網址（活動當天臨時補用）")
+    p_url.add_argument("code", nargs="?", help="課程代碼，例如 KEY1001-D；省略 = 列出缺網址的場次")
+    p_url.add_argument("url", nargs="?", help="課程網址；省略 = 只查目前設定的網址")
+    p_url.set_defaults(func=cmd_url)
+
     p_validate = sub.add_parser("validate", help="檢查課表與網址")
     p_validate.set_defaults(func=cmd_validate)
 
     p_plan = sub.add_parser("plan", help="印出實際錄影時間軸")
     p_plan.set_defaults(func=cmd_plan)
-
-    p_login = sub.add_parser("login", help="開瀏覽器手動登入 Autodesk")
-    p_login.add_argument("--url", help="要開的網址（預設 AU2026 數位課程目錄）")
-    p_login.set_defaults(func=cmd_login)
 
     p_probe = sub.add_parser("probe", help="列出頁面可點元素，用來補 play_selectors")
     p_probe.add_argument("url", help="課程網址或 session code")
@@ -1098,12 +1075,11 @@ MENU = [
     ("3", "列出螢幕、建立錄課場景", ["display"]),
     ("4", "試錄 8 秒，確認畫面與聲音都正常", ["obs-test", "--record-seconds", "8"]),
     ("5", "檢查課表、看錄影時間軸", ["plan"]),
-    ("6", "開瀏覽器登入 AU2026（程式自己開，launch 模式）", ["login"]),
-    ("a", "開一般瀏覽器登入、之後由程式接管（attach 模式，登入不會被擋）",
-     ["browser", "--set-mode"]),
+    ("6", "開瀏覽器登入 AU2026（登入一次就好）", ["browser", "--set-mode"]),
     ("7", "▶ 開始排程錄影", ["run"]),
     ("8", "找播放鍵選擇器（需要輸入課程代碼）", ["probe"]),
     ("9", "重新建立課程網址對照表", ["catalog"]),
+    ("u", "查／補某一堂課的網址（臨時補用）", ["url"]),
     ("i", "只產生設定檔 config.toml", ["init"]),
 ]
 

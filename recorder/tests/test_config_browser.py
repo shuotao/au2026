@@ -35,7 +35,7 @@ def write_config(extra: str = "", *, replace: tuple[str, str] | None = None) -> 
 class TestConfigValidation(unittest.TestCase):
     def test_example_config_is_valid(self) -> None:
         cfg = load_config(write_config())
-        self.assertEqual(cfg.get("browser", "mode"), "launch")
+        self.assertEqual(cfg.get("browser", "mode"), "attach")
         self.assertEqual(cfg.get("schedule", "overlap_policy"), "shift")
 
     def test_paths_resolve_against_config_dir(self) -> None:
@@ -44,19 +44,18 @@ class TestConfigValidation(unittest.TestCase):
         self.assertEqual(cfg.resolve("schedule", "file").parent, path.parent)
 
     def test_rejects_unknown_browser_mode(self) -> None:
-        path = write_config(replace=('mode = "launch"', 'mode = "telepathy"'))
+        path = write_config(replace=('mode = "attach"', 'mode = "telepathy"'))
         with self.assertRaises(ConfigError) as caught:
             load_config(path)
-        self.assertIn("launch / attach / open", str(caught.exception))
+        self.assertIn("attach / open", str(caught.exception))
 
-    def test_rejects_bad_window_position(self) -> None:
-        path = write_config(replace=("window_position = []", "window_position = [1920]"))
-        with self.assertRaises(ConfigError):
-            load_config(path)
-
-    def test_accepts_window_position_pair(self) -> None:
-        path = write_config(replace=("window_position = []", "window_position = [1920, 0]"))
-        self.assertEqual(load_config(path).get("browser", "window_position"), [1920, 0])
+    def test_attach_settings_present(self) -> None:
+        cfg = load_config(write_config())
+        self.assertEqual(cfg.get("browser", "cdp_url"), "http://localhost:9222")
+        self.assertTrue(cfg.get("browser", "fallback_to_open"))
+        self.assertEqual(
+            cfg.resolve("browser", "attach_profile_dir").name, "attach-profile"
+        )
 
     def test_rejects_bad_overlap_policy(self) -> None:
         path = write_config(replace=('overlap_policy = "shift"', 'overlap_policy = "yolo"'))
@@ -120,6 +119,10 @@ class TestNavigatorFactory(unittest.TestCase):
     def test_unknown_mode_raises(self) -> None:
         with self.assertRaises(BrowserError):
             make_navigator(BrowserSettings(mode="nope"))
+
+    def test_open_mode_is_accepted(self) -> None:
+        path = write_config(replace=('mode = "attach"', 'mode = "open"'))
+        self.assertEqual(load_config(path).get("browser", "mode"), "open")
 
     def test_attach_failure_falls_back_to_open(self) -> None:
         # 沒有東西在聽 9999 埠，attach 一定失敗 → 應該退回 open 而不是炸掉
