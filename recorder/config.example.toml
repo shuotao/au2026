@@ -1,0 +1,97 @@
+# ── AU2026 自動錄影設定 ────────────────────────────────────────────────
+# ⚠ 免責聲明：本工具錄影僅供個人學習與課後複習之用。AU 課程內容著作權屬
+#   Autodesk 及各講者所有，不得公開散布、轉載、販售或用於商業用途。
+#   使用者須自行遵守 AU 使用條款與所在地法令，違法或侵權使用與開發者無關。
+# 複製成 config.toml 後修改。所有時間單位為秒，除另有標註。
+
+[schedule]
+# 課表 CSV / ICS 檔路徑（相對於本設定檔）
+file = "my_schedule.csv"
+# code → 課程網址 對照表，由 `au2026rec catalog` 產生
+catalog = "catalog.json"
+# CSV 內的時間屬於哪個時區。AU 官方匯出一律是太平洋時間。
+source_timezone = "America/Los_Angeles"
+# 顯示與檔名用的時區
+local_timezone = "Asia/Taipei"
+# 課表沒有結束時間也沒有 duration 欄位時，預設每場多長（分鐘）
+default_duration_minutes = 60
+# 活動年份，僅在日期欄缺年份時使用
+event_year = 2026
+# 哪些 mode/format 值視為「直播」→ 時間鎖死不可挪動
+live_modes = ["live", "live-streamed", "live streamed", "livestream", "直播"]
+# 重疊處理：
+#   shift = 非直播場次往後排隊，直播場次維持原時間（推薦）
+#   skip  = 重疊的後一場直接跳過
+#   keep  = 照原時間硬幹（會互相打斷，不建議）
+overlap_policy = "shift"
+# 只錄這些 Status 的列（AU 匯出的第一欄）。留空字串一併保留無狀態欄的課表。
+status_include = ["scheduled", "registered", "confirmed", "已排定", ""]
+
+[recording]
+# 提前幾秒開網頁、按播放（給頁面載入與廣告緩衝）
+lead_seconds = 90
+# 結束後多錄幾秒（講者常超時）
+tail_seconds = 120
+# 一場錄完後休息幾秒再進下一場
+gap_seconds = 15
+# 輸出檔名樣板。可用：{code} {title} {start_local} {end_local} {mode} {track} {index}
+filename_template = "{start_local:%Y%m%d_%H%M}_{code}_{title}"
+# 檔名最長字元數（Windows 路徑限制）
+filename_max_length = 120
+
+[obs]
+host = "localhost"
+port = 4455
+password = ""          # OBS →「工具」→「WebSocket 伺服器設定」裡的密碼
+# 錄影前切到這個場景，留空 = 不切換
+scene = ""
+# 連不上 OBS 時是否仍照排程開網頁（true = 只開課不錄影）
+continue_without_obs = false
+
+[browser]
+# 導頁方式：
+#   attach = 接管一個用一般方式開、已經登入的瀏覽器（預設）。
+#            登入不會被自動化偵測擋下。用選單的「開瀏覽器登入 AU2026」
+#            或指令 `au2026rec browser --set-mode` 一鍵開好。
+#            代價：那個瀏覽器視窗要一直開著，程式靠它導頁。
+#   open   = 只呼叫系統「開這個網址」，零自動化（每場開新分頁）。
+mode = "attach"
+# attach 要接的除錯埠
+cdp_url = "http://localhost:9222"
+# 接不上瀏覽器時，是否退回 open 模式（至少網頁會開、畫面錄得到）
+fallback_to_open = true
+# 開瀏覽器登入時先開這一頁
+login_url = "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital"
+# 登入用瀏覽器的 profile 目錄，登入狀態存在這裡
+attach_profile_dir = "attach-profile"
+
+# 程式不碰視窗的大小與位置：你把瀏覽器擺成什麼樣，OBS 錄到的就是什麼樣。
+
+# 開頁後等網頁靜止幾秒再找播放鍵
+settle_seconds = 8
+# 播放鍵候選選擇器，由上往下試，點到第一個可見的就停。
+# 全部沒命中也不影響錄影，只是不會自動播；用 `au2026rec probe <code>` 可以
+# 印出實際頁面上的候選按鈕來補這份清單。
+play_selectors = [
+  "button:has-text('Watch now')",
+  "button:has-text('Join session')",
+  "button:has-text('Play')",
+  "a:has-text('Watch now')",
+  "[aria-label*='Play' i]",
+  ".vjs-big-play-button",
+  "video",
+]
+# 嘗試關掉的彈窗（cookie 同意、歡迎視窗等）
+dismiss_selectors = [
+  "button:has-text('Accept all')",
+  "button:has-text('Accept')",
+  "button:has-text('Got it')",
+  "button[aria-label='Close']",
+]
+# 每場錄完是否把分頁導回空白頁（停掉影片與聲音）
+close_page_after = true
+
+[paths]
+# 執行紀錄輸出位置
+log_file = "logs/au2026rec.log"
+report_file = "logs/sessions.csv"

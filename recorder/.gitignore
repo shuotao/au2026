@@ -1,0 +1,18 @@
+# 個人設定與課表（每個人不一樣，不進版控）
+config.toml
+my_schedule.csv
+my_schedule.ics
+# 瀏覽器登入狀態，含 cookie，絕對不要提交
+browser-profile/
+attach-profile/
+# 執行紀錄與報告
+logs/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# PyInstaller 產物
+build/
+dist/
+*.spec
+config.toml.bak-*
