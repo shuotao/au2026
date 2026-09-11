@@ -1089,6 +1089,13 @@ def interactive_menu() -> int:
     parser = build_parser()
     print(f"\nau2026rec {__version__} — AU2026 自動開課 + OBS 錄影")
     print(f"⚠ {DISCLAIMER}\n")
+    print("※ 真實課程頁還沒有人驗證過（網址與播放鍵都是事前推測的）。")
+    print("  但 OBS 錄的是整個螢幕，所以就算導頁或播放出錯，畫面照樣照時間錄。")
+    print("  出狀況時你可以自己改：")
+    print("    · 網址錯或查不到 → 選 u（或 au2026rec url 課程代碼 網址）")
+    print("    · 影片沒自動播   → 選 8 找選擇器，貼進 config.toml 的 play_selectors")
+    print("    · 完全沒切頁     → 自己把那頁開起來就好，錄影已經在跑")
+    print("  細節看 使用說明.md 開頭那一節。\n")
     print(f"工作目錄：{Path.cwd()}")
     config_path = Path("config.toml")
     if not config_path.exists():
