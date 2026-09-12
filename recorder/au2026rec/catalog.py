@@ -1,7 +1,7 @@
 """建立 code → 課程網址 對照表。
 
 AU2026 的 My Schedule CSV 只有 Session Code，沒有網址，所以要從課程目錄補。
-來源優先用同專案的 AU2026_挑課工具.html（內嵌 174 筆 session JSON）。
+來源優先用同專案的 AU2026_挑課工具.html（內嵌 173 筆 session JSON，172 個場次代碼；2026-09-11 依官方數位目錄同步）。
 """
 from __future__ import annotations
 

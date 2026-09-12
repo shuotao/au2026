@@ -119,18 +119,6 @@
   "type": "Technical Deep Dive - Digital",
   "url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1774013190323001sWOP"
  },
- "AS1552-D": {
-  "code": "AS1552-D",
-  "date": "2026-09-15",
-  "duration": "1 hr",
-  "end": "05:30 PM",
-  "mode": "On-demand",
-  "start": "04:30 PM",
-  "title": "Digital Practice Playbook: AI, Culture, and the Future of Practice",
-  "track": "Architecture",
-  "type": "Strategy Talk - Digital",
-  "url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1774562894938001pVlC"
- },
  "AS1569-D": {
   "code": "AS1569-D",
   "date": "2026-09-15",
@@ -398,7 +386,7 @@
  "AU2135-D": {
   "code": "AU2135-D",
   "date": "2026-09-16",
-  "duration": "30 min",
+  "duration": "45 min",
   "end": "05:15 PM",
   "mode": "Live",
   "start": "04:30 PM",
@@ -770,8 +758,8 @@
  "BLD1842-D": {
   "code": "BLD1842-D",
   "date": "2026-09-16",
-  "duration": "1 hr",
-  "end": "05:00 PM",
+  "duration": "1 hr 30 min",
+  "end": "05:30 PM",
   "mode": "Live",
   "start": "04:00 PM",
   "title": "What’s New in Revit 2027.x: AI, Data, and Connected Workflows",
@@ -954,7 +942,7 @@
   "end": "07:00 AM",
   "mode": "On-demand",
   "start": "06:00 AM",
-  "title": "​From Chaos to Control: ACC Model Coordination and API Strategies for Infrastructure Projects",
+  "title": "From Chaos to Control: ACC Model Coordination and API Strategies for Infrastructure Projects",
   "track": "Civil Engineering",
   "type": "Strategy Talk",
   "url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105084873001PMnL"
@@ -1126,18 +1114,6 @@
   "track": "AutoCAD & General Design",
   "type": "Strategy Talk - Digital",
   "url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1775422307288001MDoP"
- },
- "CES2497-D": {
-  "code": "CES2497-D",
-  "date": "2026-09-17",
-  "duration": "1 hr",
-  "end": "05:30 PM",
-  "mode": "Live",
-  "start": "04:30 PM",
-  "title": "Building Tomorrow: Mastering Project Delivery in the Age of Technology",
-  "track": "Infrastructure Owners",
-  "type": "Strategy Talk",
-  "url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105114755001P3jw"
  },
  "CES2548-D": {
   "code": "CES2548-D",
@@ -1318,6 +1294,18 @@
   "track": "Autodesk Platform Services (APS)",
   "type": "Technical Deep Dive - Digital",
   "url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1773883449806001l9wr"
+ },
+ "CS1579-D": {
+  "code": "CS1579-D",
+  "date": "2026-09-17",
+  "duration": "30 min",
+  "end": "08:30 AM",
+  "mode": "On-demand",
+  "start": "08:00 AM",
+  "title": "RACING AHEAD WITH DATA: Delivering a F1 Circuit with Autodesk Forma",
+  "track": "Preconstruction",
+  "type": "Technical Deep Dive - Digital",
+  "url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1774619292381001U9tm"
  },
  "CS1882-D": {
   "code": "CS1882-D",
@@ -1710,7 +1698,7 @@
   "end": "06:00 AM",
   "mode": "On-demand",
   "start": "06:00 AM",
-  "title": "From Plant Design to Product Passport: Extending P",
+  "title": "From Plant Design to Product Passport: Extending PLM and Autodesk Fusion Manage Across the Full Lifecycle",
   "track": "Impact & Sustainability",
   "type": "Technical Deep Dive",
   "url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105121913001PLAx"

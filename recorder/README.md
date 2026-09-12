@@ -63,7 +63,7 @@ cd recorder
 
 設定檔的尋找順序是：**目前工作目錄 → exe 所在資料夾**，所以最省事的做法是把
 `config.toml`、`my_schedule.csv`、`catalog.json` 三個檔案跟 exe 放在同一個資料夾，
-這樣從哪裡執行都找得到。設定範本與 173 筆課程網址對照表已經包在 exe 裡，
+這樣從哪裡執行都找得到。設定範本與課程網址對照表已經包在 exe 裡（0.1.0 發佈包內建 173 筆；repo 的 `catalog.json` 已於 2026-09-11 依官方目錄更新為 172 筆，放到 exe 旁即優先使用），
 在空資料夾選單第 9 項就能產生 `config.toml`（記得把你的課表 CSV 也放進去）。
 
 `logs\` 會寫在設定檔所在的資料夾旁邊。
@@ -128,7 +128,7 @@ Scheduled,Day 1 Keynote,KEY1001-D,2026-09-15,09:00,10:30,Digital G
 
 * 時間視為**太平洋時間**（`[schedule] source_timezone`），台灣時間自動換算。
 * CSV 沒有課程網址，所以 `Session Code` 靠 `catalog.json` 補。
-  `au2026rec catalog` 會從同專案的 `AU2026_挑課工具.html` 抽出 173 筆課程網址。
+  `au2026rec catalog` 會從同專案的 `AU2026_挑課工具.html` 抽出 172 筆課程網址（2026-09-11 官方目錄：撤下 AS1552-D、CES2497-D，新增 CS1579-D）。
   課表自己有 `URL` 欄時優先用課表的。
 * 也吃 `.ics`、分號分隔、`code/title/date/start/end` 這類自訂欄名，
   以及寫在同一格的時間區間（`9:00–11:15 AM`）。
