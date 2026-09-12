@@ -1,6 +1,6 @@
-# AU 2026 數位 Pass Session 全表（174 筆）
+# AU 2026 數位 Pass Session 全表（173 筆）
 
-> 來源：[AU 2026 Digital Session Catalog](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital?tab.digitaltabs=1689720562597001K8YZ)（2026-09-09 抓取）
+> 來源：[AU 2026 Digital Session Catalog](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital?tab.digitaltabs=1689720562597001K8YZ)（2026-09-09 抓取；**2026-09-11 依官方數位目錄重新同步**：移除已取消的 AS1552-D、CES2497-D，新增 CS1579-D，更正 BLD1842-D 結束時間 05:30 PM、講者與課名異動）
 > 時間一律為**太平洋夏令時間（PDT，UTC−7）**；「台灣時間」欄為 PDT + 15 小時換算（含跨日）。
 > Live = 直播（可錄影回看），On-demand = 隨選。
 
@@ -8,7 +8,7 @@
 
 | 分類 | 數量 |
 |---|---|
-| Live 直播 | 53 |
+| Live 直播 | 52 |
 | On-demand 隨選 | 121 |
 | Featured 精選 | 5 |
 
@@ -17,12 +17,12 @@
 | 類型 | 數量 |
 |---|---|
 | Technical Deep Dive | 76 |
-| Strategy Talk | 41 |
-| Technical Deep Dive - Digital | 13 |
+| Strategy Talk | 40 |
+| Technical Deep Dive - Digital | 14 |
 | Watch Party | 11 |
 | Strategy Talk - Panel | 8 |
-| Strategy Talk - Digital | 7 |
 | Spark Session | 6 |
+| Strategy Talk - Digital | 6 |
 | Roadmap | 6 |
 | Meetup | 3 |
 | Keynote | 2 |
@@ -35,23 +35,23 @@
 | Civil Engineering | 21 |
 | Autodesk Platform Services (APS) | 13 |
 | Construction Management | 13 |
-| Architecture | 10 |
+| Architecture | 9 |
 | AutoCAD & General Design | 9 |
 | Impact & Sustainability | 8 |
 | Community & Expert Elites | 7 |
 | Media & Entertainment | 7 |
+| Preconstruction | 7 |
+| MEP Engineering & Fabrication | 6 |
 | Software Development | 6 |
 | Product Development | 6 |
-| Preconstruction | 6 |
-| MEP Engineering & Fabrication | 6 |
+| Future Industry Innovations | 5 |
 | Structural Engineering & Fabrication | 5 |
 | Design & Engineering | 5 |
-| Future Industry Innovations | 5 |
-| Industrialized Construction | 4 |
-| Infrastructure Owners | 4 |
 | Capital Project Owners & Operators | 4 |
+| Industrialized Construction | 4 |
 | XR | 3 |
 | Inclusive Innovation, Culture, & Belonging | 3 |
+| Infrastructure Owners | 3 |
 | PLM | 2 |
 | Manufacturing Engineering | 2 |
 | Digital Factory | 2 |
@@ -66,11 +66,11 @@
 
 ### [4521-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783613621816001h6JX) Innovators Stage | What Pacesetters know that others don’t: Insights from the 2027 State of Design & Make
 - Tuesday (15th) 11:30 AM–12:15 PM PDT ｜ 台灣 9/16 02:30 ｜ Strategy Talk - Panel ｜ Live
-- 講者: Vikram Dutt
+- 講者: Solomon Jagwe; Vikram Dutt; Hickiran Tolgay; Steven Bloomer
 
 ### [4534-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783613621953001hJka) Innovators Stage | Preserving What Matters: Digital Innovation and the Future of Historic Stewardship
 - Tuesday (15th) 01:30 PM–02:15 PM PDT ｜ 台灣 9/16 04:30 ｜ Strategy Talk - Panel ｜ Live
-- 講者: Touf Hassoun; Elisabeth Zornes
+- 講者: Ramesh Sridharan; Rachel Tuller; Justin Gunther; Touf Hassoun
 
 ### [4490-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783613621677001hEkd) Innovators Stage | The Power of Storytelling in a Data-Driven World
 - Tuesday (15th) 03:00 PM–04:00 PM PDT ｜ 台灣 9/16 06:00 ｜ Strategy Talk ｜ Live
@@ -91,14 +91,13 @@
 |---|---|---|---|---|---|---|---|
 | 01:30 PM | 9/16 04:30 | [AS2515-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1784146538543001uR0e) | Ask the Experts Panel: AI in AutoCAD and Civil 3D, From Today's Tools to Tomorrow's Wor... | Spark Session | Live | AutoCAD & General Design | Anum Mithani, Alëna Iouguina 等 |
 | 01:30 PM | 9/16 04:30 | [BLD3772-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105139035001PGwK) | From Design Intent to Preconstruction Reality: Closing the Carbon Data Handover Gap | Strategy Talk - Panel | Live | Preconstruction | Marta Bouchard |
-| 01:30 PM | 9/16 04:30 | [4534-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783613621953001hJka) | Innovators Stage | Preserving What Matters: Digital Innovation and the Future of Histor... | Strategy Talk - Panel | Live | - | Touf Hassoun, Elisabeth Zornes |
+| 01:30 PM | 9/16 04:30 | [4534-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783613621953001hJka) | Innovators Stage | Preserving What Matters: Digital Innovation and the Future of Histor... | Strategy Talk - Panel | Live | - | Ramesh Sridharan, Rachel Tuller 等 |
 | 01:30 PM | 9/16 04:30 | [CES1558-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105093499001PpFQ) | One Digital Playbook – Scaling Lessons Across Level Crossing Removal | Strategy Talk - Digital | On-demand | Civil Engineering | Jack Donaghy |
 | 03:00 PM | 9/16 06:00 | [BLD3661-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1784235182551001o7r7) | AutoCAD Tips, Tricks, and the Most-Human Drafting Techniques | Technical Deep Dive | Live | Community & Expert Elites | Donnie Gladfelter |
 | 03:00 PM | 9/16 06:00 | [BLD2228-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105110259001P6AT) | Create Your Own AI Assistant That Interacts with Revit and Other Programs at the Same Time | Technical Deep Dive | Live | Architecture | Marcello Sgambelluri |
 | 03:00 PM | 9/16 06:00 | [4490-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783613621677001hEkd) | Innovators Stage | The Power of Storytelling in a Data-Driven World | Strategy Talk | Live | - | Tom Kelley |
 | 04:30 PM | 9/16 07:30 | [CS3844-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610788695001b3EZ) | AEC Roadmap: Autodesk Forma Build | Roadmap | Live | Construction Management | Tori Anderson, Courtney Wright 等 |
 | 04:30 PM | 9/16 07:30 | [AS1297-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1774013190323001sWOP) | Bridging the Knowledge Gap: An Open-Source RAG Approach to Reliable Revit Development | Technical Deep Dive - Digital | On-demand | Community & Expert Elites | 兰辉 徐 |
-| 04:30 PM | 9/16 07:30 | [AS1552-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1774562894938001pVlC) | Digital Practice Playbook: AI, Culture, and the Future of Practice | Strategy Talk - Digital | On-demand | Architecture | Evan Troxel |
 | 04:30 PM | 9/16 07:30 | [EDU3663-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610788868001b9PB) | From Classroom to Jobsite: Building Design-to-Make Curriculum with Autodesk | Strategy Talk - Panel | Live | Impact & Sustainability | Jovan Madjovski, Regan Brewer 等 |
 | 04:30 PM | 9/16 07:30 | [AS1777-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610785521001bQVd) | That's YOUR Opinion: Revit Workflow Point / Counter Point | Spark Session | Live | Community & Expert Elites | Howard Munsell, Matthew Preston 等 |
 | 04:30 PM | 9/16 07:30 | [CES2338-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1775422307288001MDoP) | Unlocking the CADD Manager’s Bag: What's Inside? Keys to Navigate Disruption and Speed ... | Strategy Talk - Digital | On-demand | AutoCAD & General Design | Joseph Gaffney |
@@ -142,7 +141,7 @@
 | 06:00 AM | 9/15 21:00 | [AU4178-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105146340001PP0K) | Do You Trust Me? Building Trustworthy AI for Design and Engineering Workflows | Strategy Talk | On-demand | Future Industry Innovations | Ousama Lakhdar-Ghazal |
 | 06:00 AM | 9/15 21:00 | [MFG2507-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105115317001PKkc) | Driving Business Impact with PLM: A Customer Panel Discussion | Strategy Talk - Panel | On-demand | PLM | Michael Vesperman |
 | 06:00 AM | 9/15 21:00 | [CES1635-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105097424001PORi) | Dr. Vibe: How I Learned to Stop Worrying and Start Loving Autodesk Platform Services | Technical Deep Dive | On-demand | Autodesk Platform Services (APS) | Winston Pagliaro |
-| 06:00 AM | 9/15 21:00 | [BLD2703-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105120275001PHMl) | Eaton and Trane: 1-GW Data Center Codesign with BIM and Autodesk Forma | Strategy Talk | On-demand | MEP Engineering & Fabrication | Justin Carron, Kieran Mak 等 |
+| 06:00 AM | 9/15 21:00 | [BLD2703-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105120275001PHMl) | Eaton and Trane: 1-GW Data Center Codesign with BIM and Autodesk Forma | Strategy Talk | On-demand | MEP Engineering & Fabrication | Justin Carron, Matt Lemay 等 |
 | 06:00 AM | 9/15 21:00 | [EDU1915-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105103564001PRP6) | EDU1455 Unlock the power of AI for AutoCAD 2027 Toolsets | Technical Deep Dive | On-demand | AutoCAD & General Design | Lina El-Khoury, Hung Nguyen |
 | 06:00 AM | 9/15 21:00 | [BES3454-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105132956001POm3) | End-to-End Drainage Design with Forma, InfoDrainage and Civil 3D | Technical Deep Dive | On-demand | Civil Engineering | Javier Soto |
 | 06:00 AM | 9/15 21:00 | [CES2572-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105116959001PJI2) | End-to-End New Geolocation Solution Across Autodesk Platforms: From Civil 3D to Revit | Strategy Talk | On-demand | Civil Engineering | Frank Huang |
@@ -161,7 +160,7 @@
 | 06:00 AM | 9/15 21:00 | [AS1983-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105104668001PXiN) | From Massing to Metrics: Integrating Autodesk Forma and Autodesk Forma Carbon Insights ... | Technical Deep Dive | On-demand | MEP Engineering & Fabrication | Isaac McCormack, Jessica Carson 等 |
 | 06:00 AM | 9/15 21:00 | [CES1305-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105090575001PhDo) | From Messy to Meaningful: Ground Truth, Update-Ready Site Context in Revit | Technical Deep Dive | On-demand | Architecture | Joseph Huang, Raghavendra Bhat |
 | 06:00 AM | 9/15 21:00 | [CES2548-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105115864001PITz) | From Pilot to Competitive Advantage: Scaling Generative Design with Autodesk Forma and ... | Strategy Talk | On-demand | Civil Engineering | Kristoffer Spendrup Bugge, Andreas Bjune Kjølseth |
-| 06:00 AM | 9/15 21:00 | [IM2770-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105121913001PLAx) | From Plant Design to Product Passport: Extending P | Technical Deep Dive | On-demand | Impact & Sustainability | Andreas Nicolescu |
+| 06:00 AM | 9/15 21:00 | [IM2770-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105121913001PLAx) | From Plant Design to Product Passport: Extending PLM and Autodesk Fusion Manage Across ... | Technical Deep Dive | On-demand | Impact & Sustainability | Andreas Nicolescu |
 | 06:00 AM | 9/15 21:00 | [UTL3867-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105140137001PrlV) | From Plan to Pour: Aurigo Primus Plan and Autodesk Forma for Asset Owners | Technical Deep Dive | On-demand | Construction Management | Johann Potgieter |
 | 06:00 AM | 9/15 21:00 | [CP3562-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105134044001PaID) | From Prompt to Production: Designing Furniture at the Speed of AI with Fusion | Technical Deep Dive | On-demand | Product Development | Melike Ozdemir |
 | 06:00 AM | 9/15 21:00 | [BLD2652-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105118630001PkZU) | From Reality to Simulation: Capturing, Predicting & Replaying the Experience of Design ... | Technical Deep Dive | On-demand | Software Development | Kean Walmsley |
@@ -208,7 +207,7 @@
 | 10:30 AM | 9/16 01:30 | [4742-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1786064956156001EUxj) | Global Autodesk Group Network (AGN) Digital Meetup | Meetup | On-demand | - | - |
 | 11:30 AM | 9/16 02:30 | [CES1217-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1773752414251001vaMm) | From Autodesk Forma to IFC Compliance: Automating BIM Validation in Railway Projects | Technical Deep Dive - Digital | On-demand | Civil Engineering | Thiago Dantas, Juliana Scanoni 等 |
 | 11:30 AM | 9/16 02:30 | [CS1882-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610787819001b4nA) | From Prompts to Project Outcomes: Using Autodesk Assistant in Autodesk Forma | Technical Deep Dive | Live | Construction Management | Kristina Youngblut, Shir Rustici |
-| 11:30 AM | 9/16 02:30 | [4521-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783613621816001h6JX) | Innovators Stage | What Pacesetters know that others don’t: Insights from the 2027 Stat... | Strategy Talk - Panel | Live | - | Vikram Dutt |
+| 11:30 AM | 9/16 02:30 | [4521-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783613621816001h6JX) | Innovators Stage | What Pacesetters know that others don’t: Insights from the 2027 Stat... | Strategy Talk - Panel | Live | - | Solomon Jagwe, Vikram Dutt 等 |
 | 11:30 AM | 9/16 02:30 | [AU1394-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610786206001bN9t) | Production-Ready Auth for MCP Servers: A Practical Deep Dive for Autodesk Platform Serv... | Technical Deep Dive | Live | Autodesk Platform Services (APS) | Petr Broz, Akash Srivastava |
 | 11:30 AM | 9/16 02:30 | [BES1515-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1774522344009001EyD5) | The AutoCAD Plant 3D 2027 Treasure Chest: Unlocking Collaborative Efficiency in Process... | Technical Deep Dive - Digital | On-demand | AutoCAD & General Design | Bernd Gerstenberger |
 
@@ -256,8 +255,8 @@
 | 03:00 PM | 9/18 06:00 | [CES4124-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105144692001PYz6) | Overcoming the Seven Deadly Sins of Civil 3D Project Performance | Technical Deep Dive | Live | Civil Engineering | Donnie Gladfelter |
 | 04:00 AM | 9/17 19:00 | [WP1006-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783353512175001buzr) | Community watching party: Day 1 Keynote in Korean | Watch Party | Live | - | - |
 | 04:00 AM | 9/17 19:00 | [WP1005-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783353512028001bXbT) | Community watching party: Day 1 Keynote in Chinese | Watch Party | Live | - | - |
-| 04:30 PM | 9/18 07:30 | [CES2497-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105114755001P3jw) | Building Tomorrow: Mastering Project Delivery in the Age of Technology | Strategy Talk | Live | Infrastructure Owners | Kelly Barber |
 | 06:00 PM | 9/18 09:00 | [CES2101-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105106330001P9Wl) | Turning BIM into AI-Powered Digital Twins: Real-Time Predictive Maintenance with IoT | Technical Deep Dive | On-demand | Civil Engineering | Tolga Bozkurt |
+| 08:00 AM | 9/17 23:00 | [CS1579-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1774619292381001U9tm) | RACING AHEAD WITH DATA: Delivering a F1 Circuit with Autodesk Forma | Technical Deep Dive - Digital | On-demand | Preconstruction | Irene Ruiz-Castillo, Jesus Fuentes |
 | 08:00 AM | 9/17 23:00 | [BES3035-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1775545956165001lDyI) | Beyond Automotive: Scaling Autodesk VRED for Industrial Design Reviews | Technical Deep Dive - Digital | On-demand | XR | Prashant Kalyani, AkshayKumar Pawar |
 | 08:00 AM | 9/17 23:00 | [BES2247-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1775305826464001ptxz) | Building MEP Automation Tools with pyRevit: Real Examples from High-Rise Project Delivery | Technical Deep Dive - Digital | On-demand | MEP Engineering & Fabrication | Zaid Fahed |
 | 08:30 AM | 9/17 23:30 | [CS4095-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105143586001Pvfl) | Connected Preconstruction: BuildingConnected Workflows in Autodesk Forma | Technical Deep Dive | Live | Preconstruction | Samira Tily, Cory Kintz 等 |
@@ -299,7 +298,6 @@
 | [CES1558-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105093499001PpFQ) | One Digital Playbook – Scaling Lessons Across Level Crossing Removal | Tuesday 15 01:30 PM | 9/16 04:30 | Strategy Talk - Digital | On-demand | Civil Engineering | Jack Donaghy |
 | [BLD2228-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105110259001P6AT) | Create Your Own AI Assistant That Interacts with Revit and Other Programs at the Same Time | Tuesday 15 03:00 PM | 9/16 06:00 | Technical Deep Dive | Live | Architecture | Marcello Sgambelluri |
 | [CS3844-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610788695001b3EZ) | AEC Roadmap: Autodesk Forma Build | Tuesday 15 04:30 PM | 9/16 07:30 | Roadmap | Live | Construction Management | Tori Anderson, Courtney Wright 等 |
-| [AS1552-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1774562894938001pVlC) | Digital Practice Playbook: AI, Culture, and the Future of Practice | Tuesday 15 04:30 PM | 9/16 07:30 | Strategy Talk - Digital | On-demand | Architecture | Evan Troxel |
 | [BES4067-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105142483001PUlQ) | Agents of Change: Mastering Agentic AI and MCP Workflows for the Multi-Discipline AEC Firm | Tuesday 15 06:00 AM | 9/15 21:00 | Strategy Talk | On-demand | Structural Engineering & Fabrication | Michael Gustafson, Andrew Sundal |
 | [BES3266-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105129651001P9u0) | AI Changes the Cost Curve but Connected Data Changes Value Creation | Tuesday 15 06:00 AM | 9/15 21:00 | Strategy Talk | On-demand | Structural Engineering & Fabrication | Knut Ramstad, Marius Jablonskis |
 | [CES3138-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105129097001PVyz) | AI Data Check for Civil 3D: Validating Models Against Project Requirements via APS | Tuesday 15 06:00 AM | 9/15 21:00 | Technical Deep Dive | On-demand | Civil Engineering | Mohamad KASSIR |
@@ -318,7 +316,7 @@
 | [CES2118-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105107422001PJjY) | Data-Driven Water Utilities: BIM-GIS Validation and Digital Twins at Gruppo CAP | Tuesday 15 06:00 AM | 9/15 21:00 | Technical Deep Dive | On-demand | Infrastructure Owners | Antonio Devito, Giuseppe Barberio |
 | [CES1592-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105094617001PMyb) | Design Fast, Validate Smart: Extending InfoDrainage with Parametric Workflows in Civil 3D and InfoWorks ICM to Deliver Multiple Benefits | Tuesday 15 06:00 AM | 9/15 21:00 | Strategy Talk | On-demand | Civil Engineering | Juan Aguirrebengoa, Pablo Souto |
 | [CS3563-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105134584001PuPN) | Digital Project Delivery, Forma Build Implementation | Tuesday 15 06:00 AM | 9/15 21:00 | Technical Deep Dive | On-demand | Construction Management | Rania Hassan |
-| [BLD2703-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105120275001PHMl) | Eaton and Trane: 1-GW Data Center Codesign with BIM and Autodesk Forma | Tuesday 15 06:00 AM | 9/15 21:00 | Strategy Talk | On-demand | MEP Engineering & Fabrication | Justin Carron, Kieran Mak 等 |
+| [BLD2703-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105120275001PHMl) | Eaton and Trane: 1-GW Data Center Codesign with BIM and Autodesk Forma | Tuesday 15 06:00 AM | 9/15 21:00 | Strategy Talk | On-demand | MEP Engineering & Fabrication | Justin Carron, Matt Lemay 等 |
 | [BES3454-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105132956001POm3) | End-to-End Drainage Design with Forma, InfoDrainage and Civil 3D | Tuesday 15 06:00 AM | 9/15 21:00 | Technical Deep Dive | On-demand | Civil Engineering | Javier Soto |
 | [CES2572-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105116959001PJI2) | End-to-End New Geolocation Solution Across Autodesk Platforms: From Civil 3D to Revit | Tuesday 15 06:00 AM | 9/15 21:00 | Strategy Talk | On-demand | Civil Engineering | Frank Huang |
 | [AS2841-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105123006001PT79) | Forma to Energy: AI-Powered Workflows for Carbon Insight | Tuesday 15 06:00 AM | 9/15 21:00 | Technical Deep Dive | On-demand | MEP Engineering & Fabrication | Daniel Stine, Tetsuya Hishida 等 |
@@ -361,12 +359,12 @@
 | [CS2875-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610788163001bxfW) | Innovators Stage | I'll Take "Clash Detected" for 400: An AECO Jeopardy Challenge | Thursday 17 01:30 PM | 9/18 04:30 | Spark Session | Live | Construction Management | Fabiane Amorim, Erica Bowman 等 |
 | [CES3970-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610787656001bjQq) | Civil BIM Runway Digital Twin | Thursday 17 03:00 PM | 9/18 06:00 | Technical Deep Dive | Live | Infrastructure Owners | Clint Davis |
 | [CES4124-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105144692001PYz6) | Overcoming the Seven Deadly Sins of Civil 3D Project Performance | Thursday 17 03:00 PM | 9/18 06:00 | Technical Deep Dive | Live | Civil Engineering | Donnie Gladfelter |
-| [CES2497-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105114755001P3jw) | Building Tomorrow: Mastering Project Delivery in the Age of Technology | Thursday 17 04:30 PM | 9/18 07:30 | Strategy Talk | Live | Infrastructure Owners | Kelly Barber |
 | [CES2101-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105106330001P9Wl) | Turning BIM into AI-Powered Digital Twins: Real-Time Predictive Maintenance with IoT | Thursday 17 06:00 PM | 9/18 09:00 | Technical Deep Dive | On-demand | Civil Engineering | Tolga Bozkurt |
 | [BES2247-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1775305826464001ptxz) | Building MEP Automation Tools with pyRevit: Real Examples from High-Rise Project Delivery | Thursday 17 08:00 AM | 9/17 23:00 | Technical Deep Dive - Digital | On-demand | MEP Engineering & Fabrication | Zaid Fahed |
+| [CS1579-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1774619292381001U9tm) | RACING AHEAD WITH DATA: Delivering a F1 Circuit with Autodesk Forma | Thursday 17 08:00 AM | 9/17 23:00 | Technical Deep Dive - Digital | On-demand | Preconstruction | Irene Ruiz-Castillo, Jesus Fuentes |
 | [CS4095-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783105143586001Pvfl) | Connected Preconstruction: BuildingConnected Workflows in Autodesk Forma | Thursday 17 08:30 AM | 9/17 23:30 | Technical Deep Dive | Live | Preconstruction | Samira Tily, Cory Kintz 等 |
 | [TR1702-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610789260001bqNn) | Rivian’s Digital Twin Strategy: Turning Asset Data into a Product, Not a Byproduct | Thursday 17 08:30 AM | 9/17 23:30 | Technical Deep Dive | Live | Preconstruction | Derek Milz |
 | [CES2161-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610787490001bc3e) | Building the Intelligent Catchment: Using InfoWorks ICM and AI to Create Cleaner, More Resilient Water Environments | Thursday 17 11:30 AM | 9/18 02:30 | Technical Deep Dive | Live | Civil Engineering | Samer Muhandes, Tony Smithson |
 | [AS3913-D](https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital/session/1783610786072001bigK) | Innovators Stage | Whose Model Is It Anyway? (Comedy Show) | Thursday 17 11:30 AM | 9/18 02:30 | Spark Session | Live | Architecture | Gil Cordle, Donnie Gladfelter 等 |
 
-共 73 筆。
+共 72 筆。

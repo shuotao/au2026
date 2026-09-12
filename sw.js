@@ -2,13 +2,13 @@
  *
  * 職責很窄：**只負責在沒網路時把已經存好的檔案供應出來**。
  * 「要不要下載、下載哪些」由頁面上的「離線閱覽」開關決定（見 offline.js），
- * 這樣使用者才看得到下載進度，也才不會有人在沒同意的情況下被灌 1.8 MB。
+ * 這樣使用者才看得到下載進度，也才不會有人在沒同意的情況下被灌 2 MB 多。
  *
  * 版本規則：改過任何被快取的檔案，就把 VERSION 加一。
  * 舊版快取會在 activate 時清掉，頁面那邊會提示使用者重新下載。
  */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = "au2026-" + VERSION;   // 必須與 offline.js 的 CACHE 一致
 
 self.addEventListener("install", () => {

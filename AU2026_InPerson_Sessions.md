@@ -1,4 +1,7 @@
 # Autodesk University 2026 — In-Person Session Catalog
+
+> 🕰 **這是 2026-07-21 的歷史快照，已過時。** 官方目錄之後又加場、撤場、改時間與改名；最新資料請看各網頁（2026-09-11 已用 `scripts/sync_catalog.py` 依官方現場／數位目錄重新同步）。
+
 - **活動日期**：2026 年 9 月 14–17 日（正式議程 9/15–17，9/14 有商店）
 - **時區**：Pacific Time (PDT)
 - **來源**：https://conferences.autodesk.com/ ... /sessioncatalog/page/inperson

@@ -14,7 +14,7 @@
 (function () {
   "use strict";
 
-  var CACHE = "au2026-v1";          // 必須與 sw.js 的 CACHE 一致
+  var CACHE = "au2026-v2";          // 必須與 sw.js 的 CACHE 一致
   var SW_URL = "./sw.js";
   var LS_KEY = "au2026offline";
 
@@ -151,7 +151,7 @@
     label.textContent = text || "離線閱覽";
     btn.title = on
       ? "已下載，沒網路時六個工具頁都打得開。點一下可關閉並刪除已下載的資料。"
-      : "點一下把六個挑課工具下載到這台裝置，之後沒網路也能用（約 1.8 MB）。";
+      : "點一下把六個挑課工具下載到這台裝置，之後沒網路也能用（約 2.2 MB）。";
   }
 
   /* ---------------- 開啟：下載 ---------------- */
