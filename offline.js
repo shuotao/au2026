@@ -18,7 +18,7 @@
   var SW_URL = "./sw.js";
   var LS_KEY = "au2026offline";
 
-  // 要抓下來的檔案。全部是同網域的靜態檔。
+  // 要抓下來的檔案。全部是同網域的靜態檔。（必須與 sw.js 的 ASSETS 一致：換版時 sw.js 靠它自動補抓）
   var ASSETS = [
     "./index.html",
     "./planner.html",
