@@ -727,10 +727,14 @@ def cmd_browser(args: argparse.Namespace) -> int:
             allow_autoplay = args.autoplay or bool(cfg.get("browser", "allow_autoplay"))
             if allow_autoplay:
                 print("  （已開啟自動播放旗標：On-demand 會自動播，但直播會壞掉）")
+            extra_args = [str(a) for a in (cfg.get("browser", "extra_args") or [])]
+            if extra_args:
+                print(f"  （額外旗標：{' '.join(extra_args)}）")
             browserlaunch.launch(
                 chosen, profile_dir=profile, port=port,
                 url=str(cfg.get("browser", "login_url")),
                 allow_autoplay=allow_autoplay,
+                extra_args=extra_args,
             )
         except browserlaunch.LaunchError as exc:
             print(f"✗ {exc}")

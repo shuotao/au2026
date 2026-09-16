@@ -43,6 +43,10 @@ DEFAULTS: dict[str, dict[str, Any]] = {
         "login_url": "https://conferences.autodesk.com/flow/autodesk/au2026/sessioncatalog/page/digital",
         "attach_profile_dir": "attach-profile",
         "allow_autoplay": False,
+        # 開登入用瀏覽器時要多帶的旗標，原樣接在命令列後面（預設不帶）。
+        # 留給「只能靠瀏覽器旗標解」的環境問題，例如某條線路連 CDN 特別慢時
+        # 用 --host-resolver-rules 把它導到別的位址。
+        "extra_args": [],
         "settle_seconds": 8,
         "play_selectors": [
             # 2026-09-15 真實課程頁實測：AU 用 video.js（Brightcove）。
@@ -201,6 +205,14 @@ def _validate(cfg: Config) -> None:
         value = cfg.get(section, key)
         if not isinstance(value, int) or value < 0:
             raise ConfigError(f"[{section}] {key} 必須是 0 或正整數，讀到 {value!r}")
+    extra_args = cfg.get("browser", "extra_args")
+    if not isinstance(extra_args, list) or any(not isinstance(a, str) for a in extra_args):
+        raise ConfigError(
+            "[browser] extra_args 必須是字串陣列，例如 "
+            'extra_args = ["--host-resolver-rules=MAP example.com 1.2.3.4"]'
+            f"，讀到 {extra_args!r}"
+        )
+
     mode = str(cfg.get("browser", "mode")).lower()
     if mode == "launch":
         # 舊版的模式。不要因為設定檔沒跟著改就整個跑不動 —— 直接當成 attach。

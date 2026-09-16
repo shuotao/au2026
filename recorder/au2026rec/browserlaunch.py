@@ -21,6 +21,7 @@ import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Sequence
 
 DEFAULT_PORT = 9222
 
@@ -98,8 +99,15 @@ def launch(
     url: str = "",
     wait_seconds: int = 30,
     allow_autoplay: bool = False,
+    extra_args: Sequence[str] = (),
 ) -> None:
-    """啟動瀏覽器並等除錯埠打開。除了除錯埠與 profile 目錄外不加任何參數。"""
+    """啟動瀏覽器並等除錯埠打開。除了除錯埠與 profile 目錄外不加任何參數。
+
+    extra_args 是使用者自己在 config.toml 裡指定的旗標，原樣接在後面。
+    程式不解讀、不驗證內容 —— 有些環境問題只能靠瀏覽器旗標解（實例見
+    使用說明「影片一直轉圈圈／畫質一直被壓低」那一節的 --host-resolver-rules），
+    沒有這個出口就得自己寫一行批次檔開瀏覽器，那等於繞過整個引導設定。
+    """
     if port_is_open(port):
         raise LaunchError(
             f"埠號 {port} 已經有東西在聽了。可能是你已經開過一個帶除錯埠的瀏覽器 —— "
@@ -123,6 +131,7 @@ def launch(
         # 同一個已登入的 profile，只差這個旗標，行為就完全相反。
         # 所以預設不帶（直播錯過就沒了），補錄 On-demand 時才打開。
         command.append("--autoplay-policy=no-user-gesture-required")
+    command.extend(str(arg) for arg in extra_args if str(arg).strip())
     if url:
         command.append(url)
     try:
