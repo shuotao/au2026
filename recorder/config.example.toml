@@ -77,6 +77,15 @@ attach_profile_dir = "attach-profile"
 # 錄直播時保持 false，之後補錄 On-demand 再開成 true（或用 browser --autoplay）。
 allow_autoplay = false
 
+# 開登入用瀏覽器時要多帶的旗標，原樣接在命令列後面。程式不解讀內容。
+# 預設空的；留給「只能靠瀏覽器旗標解」的環境問題。實例（2026-09-16 實測）：
+# 台灣家用光纖連 Brightcove 直播的 CDN 節點時，IPv4 那條路壅塞、畫質一路被壓到
+# 最低還轉圈圈，改走 IPv6 就穩定 1080p。把該網域釘到 IPv6 位址：
+#   extra_args = ["--host-resolver-rules=MAP fastly.live.brightcove.com [2a04:4e42:87::539]"]
+# 位址要自己查（nslookup -type=AAAA fastly.live.brightcove.com），而且會變 ——
+# 這是排錯手段，不是預設值。改完要重開瀏覽器才生效。
+extra_args = []
+
 # 程式不碰視窗的大小與位置：你把瀏覽器擺成什麼樣，OBS 錄到的就是什麼樣。
 
 # 開頁後等網頁靜止幾秒再找播放鍵
