@@ -164,12 +164,29 @@ class ObsController:
         return "started"
 
     def stop_recording(self) -> str | None:
-        """停止錄影，回傳輸出檔案路徑（OBS 版本較舊時可能為 None）。"""
+        """停止錄影，回傳輸出檔案路徑（OBS 版本較舊時可能為 None）。
+
+        不論 GetRecordStatus 怎麼回報，一律送出 StopRecord。先前的寫法是
+        `output_active` 一為 False 就直接 return，不送停止指令 —— 只要那一次查詢
+        剛好落在狀態空窗（實測：剛下 StartRecord、編碼器還在初始化時就會發生），
+        OBS 就會一直錄下去：
+          * 這一場的檔案沒有收尾（缺 moov atom，播放器打不開）
+          * 下一場 start_recording 撞到「已經在錄」，整場沿用錯的檔案或被跳過
+          * 上層只看到 output_path=None，仍然記成 recorded，隔天才發現
+        真的沒在錄時，OBS 會回 StopRecord 的錯誤，那時再記 warning 就好 ——
+        代價只是一則 log，比默默不停掉錄影安全得多。
+        """
         client = self._require()
-        if not self.is_recording():
-            log.warning("要求停止錄影，但 OBS 目前並未在錄影")
+        active = self.is_recording()
+        if not active:
+            log.warning("OBS 回報目前沒有在錄影，仍送出一次停止錄影（狀態可能只是還沒更新）")
+        try:
+            response = client.stop_record()
+        except Exception as exc:  # noqa: BLE001 - obsws 例外型別依版本而異
+            if active:
+                raise ObsError(f"停止錄影失敗：{exc}") from exc
+            log.warning("OBS 確認並未在錄影，停止錄影沒有作用：%s", exc)
             return None
-        response = client.stop_record()
         path = getattr(response, "output_path", None)
         log.info("OBS 停止錄影，輸出：%s", path or "（OBS 未回報路徑）")
         return str(path) if path else None
