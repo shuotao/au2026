@@ -29,6 +29,17 @@ log = logging.getLogger(__name__)
 # 「查無此課」的頁面長這樣：HTTP 200、版面正常，只有內容區寫這一句。
 _MISSING_SESSION = "text=No session to display"
 
+# 有一部分 Digital 場次不是內嵌播放器，而是 Zoom webinar：頁面上只有一顆加入鍵，
+# 點下去會跳出 Zoom（要另外登入、而且會把你算成與會者）。這種場次沒有 <video>
+# 可以播，錄下來只會是那一頁網頁 —— 早一點講比錄完才發現好。
+_WEBINAR_JOIN = (
+    ".webinar-join-btn",
+    "button:has-text('Join webinar')",
+    "a:has-text('Join webinar')",
+)
+# 內嵌播放器（Brightcove video.js）。有它就不是 webinar-only。
+_PLAYER = ".video-js, video"
+
 MODE_ATTACH = "attach"
 MODE_OPEN = "open"
 MODES = (MODE_ATTACH, MODE_OPEN)
@@ -422,6 +433,20 @@ class AttachNavigator(Navigator):
             log.debug("檢查課程頁是否存在時出錯", exc_info=True)
             return False
 
+    def session_is_webinar(self) -> bool:
+        """這一頁是不是 Zoom webinar（只有加入鍵、沒有內嵌播放器）。
+
+        判斷順序刻意是「先找播放器、再找加入鍵」：有些課程頁在播放器旁邊也會放
+        Zoom 連結（例如同步的線上問答），那種場次照樣錄得到，不能被誤判。
+        """
+        try:
+            if self.page.locator(_PLAYER).count():
+                return False
+            return any(self.page.locator(selector).count() for selector in _WEBINAR_JOIN)
+        except Exception:
+            log.debug("檢查課程頁是不是 webinar 時出錯", exc_info=True)
+            return False
+
     def open_session(self, url: str, *, lock_quality: bool = True) -> dict[str, Any]:
         """開課程頁並確保它在播。
 
@@ -442,6 +467,17 @@ class AttachNavigator(Navigator):
                 "這個網址打開是空的（No session to display）—— 該場很可能已經被官方撤下。"
                 "到 AU 網站的 My Schedule 重新匯出課表覆蓋掉舊的，再跑 au2026rec catalog；"
                 "單場要補的話用 au2026rec url <課程代碼> <網址>。"
+            )
+            return result
+
+        if self.session_is_webinar():
+            result["webinar"] = True
+            result["note"] = "這場是 Zoom webinar，頁面沒有內嵌播放器，錄到的只會是網頁本身"
+            log.warning(
+                "這場走的是 Zoom webinar：頁面上只有加入鍵、沒有內嵌播放器。"
+                "程式不會替你按加入 —— Zoom 需要另外登入，而且按下去就把你算成與會者。"
+                "OBS 照樣會錄完整個時段，但錄到的只有這一頁；要留下內容請自己加入並把 "
+                "Zoom 視窗擺進錄影範圍，或改看官方事後放出的錄影。"
             )
             return result
 
